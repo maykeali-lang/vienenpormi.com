@@ -53,23 +53,3 @@ docs/             el post técnico / making-of
 > corre completo solo con `web/public/`. Ver `.gitignore`.
 
 ---
-
-## Google Analytics 4 — activar
-
-El sitio ya trae el snippet de GA4 (en `web/index.html`,
-`web/public/rider/index.html` y `web/public/devlog/index.html`), **inactivo** tras un
-placeholder. Para encenderlo:
-
-1. Entra a **https://analytics.google.com** → *Administrar* → **Crear propiedad**.
-2. Nómbrala (ej. «Vienen por mí»), elige zona horaria y moneda.
-3. En **Flujos de datos** → *Web*, agrega `https://vienenpormi.com`.
-4. Copia el **ID de medición** con formato `G-XXXXXXXXXX`.
-5. Reemplaza el texto `G-XXXXXXXXXX` por tu ID en los **tres** archivos de arriba.
-6. Reconstruye y despliega: `cd web && npm run build`.
-
-Mientras el ID siga siendo `G-XXXXXXXXXX`, el snippet no carga nada (no rastrea). Una
-vez puesto el ID real, GA4 registra visitas, geografía y qué mundo abre cada quien.
-
----
-
-Hecho a lápiz, marcador y código en Maracaibo · Zulia · Venezuela 🇻🇪
