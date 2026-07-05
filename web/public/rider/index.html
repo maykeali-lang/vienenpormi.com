@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>vienen por mi — basic rider</title>
+  <meta name="description" content="Basic rider / rider técnico de Vienen Por Mí — power trío de Maracaibo, Venezuela. Ver, descargar en PDF o copiar el texto." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- Google Analytics 4 — reemplaza G-XXXXXXXXXX por tu ID de medición. -->
+  <script>
+    (function () {
+      var GA_ID = "G-XXXXXXXXXX";
+      if (GA_ID.indexOf("XXXX") !== -1) return;
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://www.googletagmanager.com/gtag/js?id=" + GA_ID;
+      document.head.appendChild(s);
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      window.gtag = gtag;
+      gtag("js", new Date());
+      gtag("config", GA_ID);
+    })();
+  </script>
+  <style>
+    /* misma identidad que la web: papel, tinta y el azul agua */
+    :root {
+      --paper: #f2ead8;
+      --card: #fdfcf8;
+      --ink: #131210;
+      --agua: #4a2c82; /* lion-violet */
+      --mono: "Space Mono", ui-monospace, monospace;
+      --disp: "Archivo Black", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--mono);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 84px 6vw 10vh;
+    }
+    a { color: inherit; }
+    .back {
+      position: fixed;
+      top: 20px;
+      left: 5vw;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-decoration: none;
+      opacity: 0.75;
+      border-bottom: 1px solid transparent;
+      transition: opacity 0.2s ease, border-color 0.2s ease;
+    }
+    .back:hover { opacity: 1; border-bottom-color: var(--ink); }
+
+    header { text-align: center; margin-bottom: 2.4rem; }
+    .num {
+      margin: 0 0 0.6rem;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      opacity: 0.6;
+    }
+    h1 {
+      margin: 0;
+      font-family: var(--disp);
+      font-weight: 400;
+      font-size: clamp(40px, 8vw, 76px);
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+    }
+    h1 .bar {
+      display: inline-block;
+      background: var(--ink);
+      color: var(--paper);
+      padding: 0 0.18em;
+    }
+    .sub { margin: 1rem 0 0; font-size: 12px; letter-spacing: 0.08em; opacity: 0.7; }
+
+    /* acciones: ver / descargar / copiar */
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 2.6rem; }
+    .btn {
+      appearance: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1.5px solid var(--ink);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.12s ease, border-color 0.2s ease;
+    }
+    .btn:hover { background: var(--ink); color: var(--paper); transform: translateY(-1px); }
+    .btn--main { background: var(--ink); color: var(--paper); }
+    .btn--main:hover { background: var(--agua); border-color: var(--agua); }
+
+    /* la hoja del rider (espejo del PDF, legible sin plugins) */
+    .sheet {
+      width: min(680px, 100%);
+      background: var(--card);
+      border: 1.5px solid rgba(19, 18, 16, 0.35);
+      border-radius: 12px;
+      box-shadow: 0 14px 40px rgba(19, 18, 16, 0.14);
+      padding: clamp(22px, 5vw, 44px);
+    }
+    .sheet section + section { margin-top: 2rem; }
+    .sechead {
+      display: flex;
+      align-items: baseline;
+      gap: 0.9rem;
+      border-bottom: 1px solid rgba(19, 18, 16, 0.16);
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.9rem;
+    }
+    .sechead .n { font-size: 10px; letter-spacing: 0.24em; color: var(--agua); }
+    .sechead h2 {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+    }
+    .sheet ul { margin: 0; padding-left: 1.2rem; }
+    .sheet li { margin: 0.45rem 0; font-size: 13.5px; line-height: 1.55; }
+    .sheet p { margin: 0.45rem 0; font-size: 13.5px; line-height: 1.65; }
+    .sheet .hi { font-weight: 700; }
+    /* ilustración del escenario (del EPK): a todo el ancho de la hoja */
+    .stage { margin: 0; }
+    .stage img {
+      display: block;
+      width: 100%;
+      border: 1.5px solid var(--ink);
+      border-radius: 4px;
+    }
+    .stage figcaption {
+      margin-top: 0.6rem;
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      opacity: 0.55;
+    }
+    footer {
+      margin-top: 2.2rem;
+      font-size: 10px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      opacity: 0.55;
+      text-align: center;
+      line-height: 2;
+    }
+  </style>
+</head>
+<body>
+  <a class="back" href="/">← vienen por mi</a>
+
+  <header>
+    <p class="num">basic rider · rider técnico</p>
+    <h1>vienen <span class="bar">por mi</span></h1>
+    <p class="sub">power trío · voz y bajo, guitarra, batería y secuencias · maracaibo, venezuela</p>
+  </header>
+
+  <nav class="actions" aria-label="Acciones del rider">
+    <a class="btn btn--main" href="./vienen-por-mi-basic-rider.pdf" target="_blank" rel="noopener">ver pdf ↗</a>
+    <a class="btn" href="./vienen-por-mi-basic-rider.pdf" download="vienen-por-mi-basic-rider.pdf">descargar pdf ↓</a>
+    <button class="btn" id="copy" type="button">copiar texto</button>
+  </nav>
+
+  <article class="sheet" id="sheet">
+    <section>
+      <div class="sechead"><span class="n">01</span><h2>Requisitos básicos</h2></div>
+      <ul>
+        <li>Caja directa (DI) para secuencias</li>
+        <li>Micrófono para 1era voz</li>
+        <li>Micrófono para 2da voz</li>
+        <li>Batería de 5 piezas</li>
+        <li>Amplificadores: 1 para bajo · 1 para guitarra</li>
+      </ul>
+    </section>
+    <section>
+      <div class="sechead"><span class="n">02</span><h2>Monitoreo y mezcla</h2></div>
+      <ul>
+        <li>Retorno / monitoreo para los 3 músicos (según la sala)</li>
+        <li>Prueba de sonido previa al show, acordada con producción</li>
+      </ul>
+    </section>
+    <section>
+      <div class="sechead"><span class="n">03</span><h2>Nota importante</h2></div>
+      <p>Es de vital importancia adaptar cualquier especificación técnica a la banda con previo acuerdo. Escríbenos y lo resolvemos.</p>
+    </section>
+    <section>
+      <div class="sechead"><span class="n">04</span><h2>Contacto</h2></div>
+      <p class="hi"><a href="mailto:vienenpormi.ve@gmail.com">vienenpormi.ve@gmail.com</a></p>
+      <p>Instagram: <a href="https://instagram.com/vienenpormi_" target="_blank" rel="noopener">@vienenpormi_</a></p>
+    </section>
+    <section>
+      <div class="sechead"><span class="n">05</span><h2>Escenario — referencia</h2></div>
+      <figure class="stage">
+        <img src="./escenario.jpg" alt="Distribución de la banda en tarima: batería al centro-fondo, guitarra con laptop y secuencias a un lateral, voz y bajo al otro" loading="lazy" />
+        <figcaption>tarima principal · distribución de la banda</figcaption>
+      </figure>
+      <p>Batería al centro-fondo; guitarra con laptop y secuencias a un lateral; voz y bajo al otro. El plano es referencial: la distribución se adapta al espacio de cada sala.</p>
+    </section>
+  </article>
+
+  <footer>
+    vienen por mi © 2026
+  </footer>
+
+  <script>
+    // copiar el rider como texto plano (para pegarlo en un chat o correo)
+    const TXT = [
+      "VIENEN POR MI — BASIC RIDER",
+      "Power trío · voz y bajo, guitarra, batería y secuencias · Maracaibo, Venezuela",
+      "",
+      "REQUISITOS BÁSICOS",
+      "- Caja directa (DI) para secuencias",
+      "- Micrófono para 1era voz",
+      "- Micrófono para 2da voz",
+      "- Batería de 5 piezas",
+      "- Amplificadores: 1 para bajo · 1 para guitarra",
+      "",
+      "MONITOREO Y MEZCLA",
+      "- Retorno / monitoreo para los 3 músicos (según la sala)",
+      "- Prueba de sonido previa al show, acordada con producción",
+      "",
+      "NOTA IMPORTANTE",
+      "Es de vital importancia adaptar cualquier especificación técnica a la banda con previo acuerdo.",
+      "",
+      "CONTACTO",
+      "vienenpormi.ve@gmail.com",
+      "Instagram: @vienenpormi_",
+      "Web: www.vienenpormi.com",
+    ].join("\n");
+
+    const btn = document.getElementById("copy");
+    btn.addEventListener("click", async () => {
+      let ok = false;
+      try {
+        await navigator.clipboard.writeText(TXT);
+        ok = true;
+      } catch {
+        // fallback para contextos sin Clipboard API
+        const ta = document.createElement("textarea");
+        ta.value = TXT;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try { ok = document.execCommand("copy"); } catch { ok = false; }
+        ta.remove();
+      }
+      btn.textContent = ok ? "copiado ✓" : "no se pudo copiar";
+      setTimeout(() => (btn.textContent = "copiar texto"), 2200);
+    });
+  </script>
+</body>
+</html>

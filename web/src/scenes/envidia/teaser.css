@@ -1,0 +1,191 @@
+/* /envidia — COMING SOON (preview de «Lion Mix»)
+   Estética del juego: e-paper marker comic — papel cálido #F2EFE4,
+   cielo del Mundo 1 #8FCBDC, tinta #1A1A1A, lápiz grafito #3A3A3E. */
+
+.et {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.2rem, 3vh, 2.2rem);
+  padding: clamp(4.5rem, 9vh, 6rem) 6vw 8vh;
+  background: #f2efe4;
+  color: #1a1a1a;
+}
+/* grano de papel cálido sobre todo el frame (un solo pase, como en el juego) */
+.et::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+}
+
+.et__back {
+  position: fixed;
+  top: 20px;
+  left: 5vw;
+  z-index: 2;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #3a3a3e;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.et__back:hover { color: #1a1a1a; border-bottom-color: #1a1a1a; }
+
+/* switch de idioma (arriba a la derecha, espejo del back) */
+.et__lang {
+  position: fixed;
+  top: 18px;
+  right: 5vw;
+  z-index: 2;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #3a3a3e;
+  background: none;
+  border: 1.5px solid rgba(26, 26, 26, 0.35);
+  border-radius: 999px;
+  padding: 6px 13px;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.et__lang:hover { color: #1a1a1a; border-color: #1a1a1a; }
+
+.et__head { text-align: center; }
+.et__num {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #3a3a3e;
+  opacity: 0.75;
+}
+.et__title {
+  margin: 0.25rem 0 0.9rem;
+  font-size: clamp(46px, 10vw, 110px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: #1a1a1a;
+  /* lettering marker: contorno + sombra plana del mismo hue más oscuro */
+  text-shadow: 4px 4px 0 #6ba6b8;
+}
+.et__soon {
+  display: inline-block;
+  padding: 9px 20px;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #f2efe4;
+  background: #1a1a1a;
+  border-radius: 999px;
+  animation: etPulse 2.4s ease-in-out infinite;
+}
+@keyframes etPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ---- playfield: color plano del Mundo 1, contorno de tinta ---- */
+.et__field {
+  position: relative;
+  margin: 0;
+  width: min(560px, 88vw);
+  aspect-ratio: 3 / 4;
+  max-height: 52vh;
+  background: #8fcbdc;
+  border: 3px solid #1a1a1a;
+  border-radius: 14px;
+  box-shadow: 7px 7px 0 rgba(26, 26, 26, 0.85);
+  overflow: hidden;
+}
+/* jitter e-paper por sprite: offset renovado a ~8 fps */
+.et__v, .et__nave {
+  position: absolute;
+  animation: etJitter 0.5s steps(4) infinite;
+}
+@keyframes etJitter {
+  0%, 100% { translate: 0 0; }
+  25% { translate: 0.6px -0.4px; }
+  50% { translate: -0.5px 0.6px; }
+  75% { translate: 0.4px 0.3px; }
+}
+
+/* los dos villanos (LOLL y el boss CAPO), alineados uno a cada lateral:
+   el centro queda libre para la nave */
+.et__villains {
+  position: absolute;
+  top: 7%;
+  left: 0;
+  right: 0;
+  height: 30%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 0 7%;
+}
+.et__villains .et__v { position: relative; }
+/* idles de diseño (aproximación CSS de las specs del demo) */
+.et__v--loll {
+  width: 22%;
+  rotate: 3deg;
+  animation: etLoll 4.4s ease-in-out infinite, etJitter 0.5s steps(4) infinite;
+}
+@keyframes etLoll {
+  0%, 100% { transform: rotate(-4deg) translateY(0); }
+  50% { transform: rotate(4deg) translateY(4px); }
+}
+/* el boss, alineado con LOLL en la fila superior, con una deriva suave */
+.et__v--capo {
+  width: 24%;
+  rotate: -3deg;
+  animation: etCapo 7s ease-in-out infinite, etJitter 0.5s steps(4) infinite;
+}
+@keyframes etCapo {
+  0%, 100% { transform: translateX(-10px); }
+  33% { transform: translateX(8px); }
+  66% { transform: translateX(-3px); }
+}
+
+.et__nave {
+  bottom: 5%;
+  left: 50%;
+  width: 27%;
+  margin-left: -13.5%;
+  animation: etFloat 5s ease-in-out infinite, etJitter 0.5s steps(4) infinite;
+}
+@keyframes etFloat {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(9px, -5px); }
+  50% { transform: translate(-7px, 3px); }
+  75% { transform: translate(5px, -2px); }
+}
+
+.et__copy {
+  max-width: 58ch;
+  text-align: center;
+}
+.et__copy p {
+  margin: 0 0 1rem;
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  line-height: 1.65;
+  color: #2b2b2e;
+}
+.et__meta {
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+@media (max-width: 720px) {
+  .et { gap: 1.1rem; }
+  .et__field { max-height: 46vh; }
+}

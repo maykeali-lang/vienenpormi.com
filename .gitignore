@@ -1,0 +1,33 @@
+# ---- dependencias / build ----
+web/node_modules/
+web/dist/
+*.local
+.DS_Store
+__pycache__/
+*.pyc
+
+# ---- entornos / secretos ----
+.env
+.env.*
+!.env.example
+
+# ---- config local de herramientas ----
+.claude/
+web/.claude/
+
+# ---- datos de runtime (contador de plays, records, notas del buzón) ----
+# se generan solos en el servidor; no son parte del código
+api/*.json
+web/server/*.json
+
+# ---- másters crudos (demasiado pesados para git; ~3 GB) ----
+# el sitio corre solo con web/public/ ; esto son las fuentes de producción
+web/audio_raw/
+web/video intro/
+web/orgullo master/
+web/ira /
+web/libreta game/
+web/about band/
+web/assets new/
+web/cover album/
+web/fanart/

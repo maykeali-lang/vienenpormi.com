@@ -1,0 +1,7 @@
+node_modules
+dist
+*.local
+.DS_Store
+audio_raw/
+__pycache__/
+*.pyc

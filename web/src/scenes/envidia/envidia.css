@@ -1,0 +1,641 @@
+/* «04 · envidia» — HUD y overlays marker-comic (Lion Mix).
+   Reglas duras del sistema: rellenos planos, contorno negro grueso,
+   nada de gradientes, glow ni drop-shadows; la luz es papel sin pintar. */
+
+.env-root {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #f4f3ee; /* blanco papel e-paper */
+  font-family: "Outfit", sans-serif;
+  color: #1a1a1a;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.env-stage,
+.env-stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* grano de papel cálido: un único pase multiplicado sobre todo el frame */
+.env-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* lettering display: Titan One con strokes apilados (sin blur) */
+.env-lettering {
+  overflow: visible;
+  display: block;
+}
+.env-lettering text {
+  font-family: "Titan One", sans-serif;
+  paint-order: stroke fill;
+  letter-spacing: -0.01em;
+}
+
+/* ------------------------------- HUD -------------------------------- */
+
+.env-hud {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* barra superior: score | marca + boss | vidas + multiplicador */
+.env-hud__top {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.env-hud__center {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.env-hud__right {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+/* panel marker: cartón de papel con contorno a tinta */
+.env-panel {
+  border: 2.5px solid #1a1a1a;
+  border-radius: 12px;
+  background: rgba(242, 239, 228, 0.88);
+  padding: 7px 13px;
+}
+.env-panel__label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+.env-panel__value {
+  display: block;
+  font-weight: 700;
+  font-size: clamp(18px, 2.2vw, 26px);
+  letter-spacing: 0.07em;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+.env-panel__sub {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+.env-panel--score {
+  min-width: 128px;
+}
+
+/* vidas: glifo + contador + barra de 20 segmentos */
+.env-panel--lives {
+  min-width: clamp(150px, 18vw, 220px);
+}
+.env-panel__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.env-panel__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.env-life {
+  width: 16px;
+  height: 16px;
+}
+.env-lifebar {
+  display: flex;
+  gap: 1.5px;
+  margin-top: 6px;
+}
+.env-lifebar__cell {
+  flex: 1;
+  height: 9px;
+  border: 1px solid #1a1a1a;
+  border-radius: 1.5px;
+  background: transparent;
+  opacity: 0.3;
+}
+.env-lifebar__cell.on {
+  background: #c1272d;
+  opacity: 1;
+}
+
+/* multiplicador de racha */
+.env-mult {
+  border: 2.5px solid #1a1a1a;
+  border-radius: 12px;
+  background: rgba(242, 239, 228, 0.88);
+  font-weight: 700;
+  font-size: clamp(16px, 2vw, 22px);
+  letter-spacing: 0.04em;
+  padding: 7px 12px;
+  display: flex;
+  align-items: center;
+}
+.env-mult.is-hot {
+  background: #e9b322;
+}
+
+/* marca del juego en cabecera */
+.env-brand {
+  width: min(32vw, 300px);
+  opacity: 0.95;
+}
+
+/* cartel de mundo/oleada: aparece y se desvanece */
+.env-wave {
+  position: absolute;
+  top: 16vh;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  animation: env-wave-in 4.2s ease forwards;
+}
+.env-wave__world {
+  width: min(52vw, 380px);
+  height: auto;
+  margin: 0 auto;
+}
+.env-wave__name {
+  font-weight: 700;
+  font-size: clamp(16px, 2vw, 22px);
+  letter-spacing: 0.04em;
+  margin-top: -4px;
+}
+.env-wave__stem {
+  font-weight: 500;
+  font-size: clamp(13px, 1.5vw, 17px);
+  opacity: 0.85;
+}
+@keyframes env-wave-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.85);
+  }
+  8% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.98);
+  }
+}
+
+/* boss CAPO: barra de vida a lápiz bajo la marca */
+.env-boss {
+  width: min(38vw, 380px);
+  text-align: center;
+}
+.env-boss__name {
+  font-weight: 700;
+  font-size: clamp(13px, 1.4vw, 16px);
+  letter-spacing: 0.08em;
+}
+.env-boss__bar {
+  margin-top: 4px;
+  height: 12px;
+  border: 2px solid #3a3a3e;
+  border-radius: 7px;
+  background: rgba(242, 239, 228, 0.5);
+  overflow: hidden;
+}
+.env-boss__fill {
+  height: 100%;
+  background: #c1272d;
+  transition: width 0.15s linear;
+}
+
+/* barra inferior: instrumentos recuperados + reloj de la canción */
+.env-hud__bottom {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.env-stems {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.env-stem {
+  font-weight: 700;
+  font-size: clamp(11px, 1.2vw, 14px);
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border: 2px dashed #3a3a3e;
+  border-radius: 999px;
+  color: #3a3a3e;
+  opacity: 0.45;
+  background: transparent;
+  transition: opacity 0.6s ease, background 0.6s ease, color 0.6s ease;
+}
+.env-stem.is-back {
+  border-style: solid;
+  border-color: #1a1a1a;
+  background: var(--stem, #1a1a1a);
+  color: #f2efe4;
+  opacity: 1;
+}
+.env-clock {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  border: 2px solid #1a1a1a;
+  border-radius: 999px;
+  padding: 4px 13px;
+  background: rgba(242, 239, 228, 0.75);
+  font-variant-numeric: tabular-nums;
+}
+
+/* progreso de la canción = duración de la partida, con marcas de mundo */
+.env-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 5px;
+  background: rgba(26, 26, 26, 0.14);
+}
+.env-progress__fill {
+  width: 0%;
+  height: 100%;
+  background: #3a3a3e;
+}
+.env-progress__mark {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 13px;
+  background: #1a1a1a;
+  opacity: 0.5;
+}
+
+/* --------------------- crawl de apertura (Star Wars) ------------------ */
+
+.env-crawl {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  background: rgba(20, 20, 22, 0.94);
+  overflow: hidden;
+  cursor: pointer;
+  transition: opacity 0.45s ease;
+}
+.env-crawl.is-leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+.env-crawl__persp {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  perspective: 360px;
+  perspective-origin: 50% 26%;
+  overflow: hidden;
+}
+.env-crawl__text {
+  position: relative;
+  width: min(84vw, 640px);
+  transform-origin: 50% 100%;
+  /* muy lento a propósito: da tiempo a leer el relato con calma */
+  animation: env-crawl 55s linear forwards;
+  color: #e9b322;
+  font-weight: 700;
+  font-size: clamp(20px, 2.8vw, 30px);
+  line-height: 1.7;
+  text-align: center;
+}
+.env-crawl__text p {
+  margin: 0 0 1.4em;
+}
+.env-crawl__ep {
+  color: #8fcbdc;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  font-size: 0.66em;
+  font-weight: 500;
+}
+.env-crawl__title {
+  width: 72%;
+  margin: 0.1em auto 0.9em;
+}
+@keyframes env-crawl {
+  from {
+    top: 104%;
+    transform: rotateX(23deg) translateZ(0);
+  }
+  to {
+    top: -260%;
+    transform: rotateX(26deg) translateZ(-900px);
+  }
+}
+.env-crawl__skip {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  font-family: inherit;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: #f2efe4;
+  background: transparent;
+  border: 2px solid #f2efe4;
+  border-radius: 999px;
+  padding: 6px 16px;
+  cursor: pointer;
+  opacity: 0.8;
+}
+.env-crawl__skip:hover {
+  opacity: 1;
+}
+
+/* --------------------------- overlays -------------------------------- */
+
+.env-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+  justify-content: center;
+  background: rgba(233, 233, 228, 0.92);
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  text-align: center;
+  padding: 24px;
+}
+.env-veil--btn {
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  font-family: inherit;
+  color: inherit;
+}
+
+.env-gate,
+.env-end {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  padding: 24px;
+  background: #f4f3ee; /* blanco papel, como el juego */
+  overflow-y: auto; /* pantallas cortas: el contenido (records) puede desbordar */
+}
+.env-end {
+  background: rgba(233, 233, 228, 0.94);
+}
+
+/* marca de cabecera del gate: LION MIX × VIENEN POR MI */
+.env-gate__brand {
+  position: absolute;
+  top: 4vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(74vw, 560px);
+}
+
+.env-gate__title,
+.env-end__title {
+  width: min(86vw, 640px);
+  height: auto;
+}
+
+.env-gate__tag,
+.env-end__msg {
+  max-width: 520px;
+  font-size: clamp(15px, 1.8vw, 18px);
+  font-weight: 500;
+  line-height: 1.5;
+  color: #1a1a1a;
+}
+
+.env-gate__keys {
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.env-btn {
+  font-family: "Outfit", sans-serif;
+  font-weight: 700;
+  font-size: clamp(15px, 1.8vw, 18px);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #1a1a1a;
+  background: #e9b322;
+  border: 3px solid #1a1a1a;
+  border-radius: 12px;
+  padding: 10px 26px;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+.env-btn:hover {
+  transform: translateY(-2px) rotate(-1deg);
+  background: #efd93f;
+}
+.env-btn--big {
+  font-size: clamp(18px, 2.4vw, 24px);
+  padding: 14px 38px;
+}
+
+.env-gate__back {
+  color: #1a1a1a;
+  opacity: 0.7;
+  text-decoration: none;
+  font-size: 13px;
+}
+.env-gate__back:hover {
+  opacity: 1;
+}
+
+.env-end__score {
+  font-size: clamp(16px, 2vw, 20px);
+  letter-spacing: 0.12em;
+}
+.env-end__row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* pantallas estrechas: el HUD se compacta y la marca cede el sitio */
+@media (max-width: 680px) {
+  .env-brand {
+    display: none;
+  }
+  .env-boss {
+    width: min(52vw, 300px);
+  }
+  .env-panel {
+    padding: 5px 9px;
+  }
+  .env-panel--score {
+    min-width: 96px;
+  }
+  .env-panel--lives {
+    min-width: 120px;
+  }
+  .env-panel__sub {
+    display: none;
+  }
+  .env-lifebar__cell {
+    height: 7px;
+  }
+  .env-clock {
+    font-size: 11px;
+    padding: 3px 9px;
+  }
+}
+
+/* ---- aviso de power-up + tabla de records (top 10) ---- */
+.env-toast {
+  position: absolute;
+  left: 50%;
+  top: 17%;
+  transform: translateX(-50%);
+  z-index: 18;
+  padding: 8px 18px;
+  border: 2.5px solid #1a1a1a;
+  border-radius: 999px;
+  background: #f4f3ee;
+  color: #1a1a1a;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: clamp(13px, 1.6vw, 16px);
+  animation: env-toast-in 0.2s ease both;
+  pointer-events: none;
+}
+@keyframes env-toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.9); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+.env-lb__entry { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+/* registro embebido en la tarjeta de muerte (récord al instante) */
+.env-lb__entry--end {
+  padding: 12px 16px;
+  border: 1px solid rgba(19, 18, 16, 0.18);
+  border-radius: 3px 12px 4px 10px;
+  background: rgba(255, 255, 255, 0.5);
+}
+.env-lb__entry-h {
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.env-lb__form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.env-lb__nick {
+  font-family: "Outfit", sans-serif;
+  font-weight: 700;
+  font-size: clamp(15px, 1.8vw, 18px);
+  letter-spacing: 0.08em;
+  color: #1a1a1a;
+  background: #fff;
+  border: 3px solid #1a1a1a;
+  border-radius: 12px;
+  padding: 9px 16px;
+  width: min(60vw, 220px);
+  text-align: center;
+}
+.env-lb__nick:focus { outline: none; background: #fffdf3; }
+.env-lb__list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 10px 14px;
+  width: min(88vw, 420px);
+  border: 3px solid #1a1a1a;
+  border-radius: 14px;
+  background: #f4f3ee;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+.env-lb__row {
+  display: grid;
+  grid-template-columns: 2.2em 1fr auto;
+  gap: 10px;
+  align-items: baseline;
+  padding: 4px 6px;
+  border-radius: 8px;
+  font-size: clamp(13px, 1.7vw, 16px);
+  letter-spacing: 0.04em;
+}
+.env-lb__row.is-me { background: #e9b322; font-weight: 800; }
+.env-lb__rank { font-weight: 800; opacity: 0.6; }
+.env-lb__who { text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: lowercase; }
+.env-lb__pts { font-variant-numeric: tabular-nums; font-weight: 700; }
+.env-lb__empty { opacity: 0.6; text-align: center; padding: 8px; }
+
+/* top-10 GLOBAL en el inicio del juego (gate) */
+.env-gate__records {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.env-gate__records-h {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.env-lb__list--gate {
+  max-height: 22vh;
+  width: min(78vw, 340px);
+  padding: 8px 12px;
+}

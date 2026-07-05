@@ -1,0 +1,22 @@
+[Unit]
+Description=Vienen por mi - contador de reproducciones (Libreta)
+After=network.target
+
+[Service]
+Type=simple
+# Ajusta la ruta si publicas en otro sitio:
+ExecStart=/usr/bin/node /var/www/vienenpormi/server/plays-server.mjs
+Environment=VPM_PORT=8787
+Environment=VPM_HOST=127.0.0.1
+Environment=VPM_DATA=/var/lib/vpm-plays/plays.json
+Restart=always
+RestartSec=2
+User=www-data
+Group=www-data
+# permisos para escribir el contador
+RuntimeDirectory=vpm-plays
+StateDirectory=vpm-plays
+WorkingDirectory=/var/www/vienenpormi/server
+
+[Install]
+WantedBy=multi-user.target
