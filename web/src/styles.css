@@ -574,33 +574,6 @@ canvas { display: block; touch-action: none; }
   pointer-events: none;
   mix-blend-mode: screen;
 }
-/* lockup compacto: cabe entre el borde y el cuadro en cualquier viewport
-   (min() con 7vh evita que baje hasta la tela en pantallas apaisadas) */
-.hero__brand {
-  position: absolute;
-  top: max(18px, 3.5vh);
-  left: 4.5vw;
-  z-index: 3;
-  text-shadow: 0 4px 16px rgba(23, 16, 25, 0.22);
-}
-.hero__brand .lk-line {
-  display: block;
-  font-family: var(--font-display);
-  font-size: min(clamp(24px, 5vw, 48px), 7vh);
-  line-height: 0.86;
-  letter-spacing: -0.03em;
-  color: #171019;
-}
-.hero__brand .lk-bar {
-  /* sticker PLANO NEGRO (el torso del cuadro) con sombra dura ROSA del
-     campo: la marca negra proyectada sobre el rosa, como la figura del óleo */
-  background: var(--bar);
-  color: var(--bar-ink);
-  padding: 0.02em 0.12em 0.06em;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-  box-shadow: 0.09em 0.09em 0 var(--logo); /* ÚNICO color: la sombra rosa del logo */
-}
 .hero__error {
   position: absolute;
   left: 50%;
@@ -614,71 +587,55 @@ canvas { display: block; touch-action: none; }
   font-size: 0.8rem;
 }
 
-/* logo = botón que abre el portfolio (SIN efecto de movimiento) */
-.hero__logobtn {
-  pointer-events: auto;
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-  text-align: left;
-  display: inline-block;
-}
-.hero__logohint {
-  display: block;
-  margin-top: 0.8rem;
-  font-size: 10px;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: rgba(23, 16, 25, 0.6);
-  opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 0.25s ease, transform 0.25s ease, color 0.25s ease;
-}
-/* al pasar por el logo: pista visible en violeta lion (sin parpadeos) */
-.hero__logobtn:hover .hero__logohint {
-  opacity: 1;
-  transform: translateY(0);
-  color: var(--agua);
-}
-@keyframes ledFlicker {
-  0%, 100% { opacity: 1; }
-  6% { opacity: 0.55; }
-  8% { opacity: 1; }
-  42% { opacity: 1; }
-  44% { opacity: 0.72; }
-  46% { opacity: 1; }
-}
-
-/* crédito de la portada: solo aparece al hacer click sobre el cuadro */
-.hero__credit {
+/* hint «about» bajo el logo-tela central: el logo ES el botón del about.
+   Aparece al pasar el cursor sobre la tela (hover detectado por raycast). */
+.hero__abouthint {
   position: absolute;
   left: 50%;
-  transform: translateX(-50%);
   bottom: 13.5%;
+  transform: translateX(-50%) translateY(6px);
   z-index: 3;
-  margin: 0;
   font-size: 10px;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: rgba(23, 16, 25, 0.65);
-  text-shadow: none;
+  color: var(--agua);
+  opacity: 0;
   pointer-events: none;
-  animation: creditIn 0.4s ease both;
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
-@keyframes creditIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+.hero__abouthint.is-on {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
-.hero__credit a {
-  pointer-events: auto;
+/* táctil (sin hover): la pista queda siempre visible, tenue */
+@media (hover: none) {
+  .hero__abouthint {
+    opacity: 0.65;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* crédito de la portada de Galue: vive en el music player (abajo, centrado) */
+.hero__playercredit {
+  position: absolute;
+  left: 50%;
+  bottom: max(14px, 2.6vh);
+  transform: translateX(-50%);
+  z-index: 7;
+  margin: 0;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(23, 16, 25, 0.55);
+  white-space: nowrap;
+}
+.hero__playercredit a {
   color: #1a7aa8;
   text-decoration: none;
   border-bottom: 1px solid rgba(62, 134, 152, 0.5);
   transition: color 0.2s ease, border-color 0.2s ease;
 }
-.hero__credit a:hover {
+.hero__playercredit a:hover {
   color: #e9b83f;
   border-color: #e9b83f;
 }
@@ -804,6 +761,11 @@ canvas { display: block; touch-action: none; }
   background:
     radial-gradient(130% 100% at 50% 118%, rgba(74, 64, 56, 0.14) 0%, rgba(74, 64, 56, 0) 48%),
     radial-gradient(120% 90% at 50% 42%, #fdf7ee 0%, #f6efe2 62%, #eee6d6 100%);
+  animation: playerModeIn 0.45s ease both;
+}
+@keyframes playerModeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* rótulo del modo player (arriba-izquierda, contraparte del toggle) */
@@ -898,11 +860,62 @@ canvas { display: block; touch-action: none; }
     0 0 0 1px rgba(74, 64, 56, 0.14),
     0 2px 0 rgba(255, 255, 255, 0.7) inset;
 }
+/* halo rosa muy sutil solo mientras suena: la carta «respira» */
+.mp__card.is-playing {
+  box-shadow:
+    0 22px 48px rgba(23, 13, 8, 0.22),
+    0 0 0 1px rgba(74, 64, 56, 0.14),
+    0 0 0 5px rgba(217, 79, 138, 0.1),
+    0 2px 0 rgba(255, 255, 255, 0.7) inset;
+}
 .mp__card.is-upcoming { border-style: dashed; opacity: 0.4; }
 .mp__card.is-upcoming.is-current { opacity: 0.75; }
+/* vinilo tras la portada: asoma girando cuando la carta está sonando */
+.mp__card-vinyl {
+  position: absolute;
+  top: 32px;
+  right: 20px;
+  width: 56%;
+  aspect-ratio: 1 / 1;
+  z-index: 0;
+  opacity: 0;
+  transform: translateX(0) scale(0.9);
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+  pointer-events: none;
+}
+.mp__card-vinyl i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  /* centro: eje tinta + etiqueta rosa; resto: surcos concéntricos */
+  background:
+    radial-gradient(circle at 50% 50%,
+      #171019 0% 10%,
+      #d94f8a 10.5% 22%,
+      #171019 22.5% 24%,
+      rgba(23, 16, 25, 0) 24.5%),
+    repeating-radial-gradient(circle at 50% 50%,
+      #180f1e 0px, #180f1e 2.5px,
+      #2c2135 3px, #180f1e 3.5px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 8px 22px rgba(23, 13, 8, 0.35);
+}
+.mp__card.is-playing .mp__card-vinyl {
+  opacity: 1;
+  transform: translateX(38%) scale(1);
+}
+.mp__card.is-playing .mp__card-vinyl i {
+  animation: vinylSpin 5s linear infinite;
+}
+@keyframes vinylSpin {
+  to { transform: rotate(360deg); }
+}
 /* portada de Galue («Donde suceden cosas», óleo 2019) en todas las cartas */
 .mp__card-art {
   position: relative;
+  z-index: 1;
   width: 100%;
   flex: 1;
   min-height: 0;
@@ -921,6 +934,24 @@ canvas { display: block; touch-action: none; }
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(23, 13, 8, 0) 26%, rgba(23, 13, 8, 0.16) 100%);
   pointer-events: none;
+}
+/* barrido de brillo sobre la portada al pasar el cursor por la carta */
+.mp__card-art::before {
+  content: "";
+  position: absolute;
+  top: -12%;
+  bottom: -12%;
+  left: -70%;
+  width: 48%;
+  z-index: 1;
+  background: linear-gradient(105deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.32) 50%, rgba(255, 255, 255, 0) 100%);
+  transform: skewX(-16deg);
+  transition: left 0.001s;
+  pointer-events: none;
+}
+.mp__card:hover .mp__card-art::before {
+  left: 135%;
+  transition: left 0.75s ease;
 }
 .mp__card.is-upcoming .mp__card-art {
   filter: grayscale(1);
@@ -1078,7 +1109,8 @@ canvas { display: block; touch-action: none; }
   box-shadow: 0 1px 5px rgba(23, 13, 8, 0.3);
   transition: transform 0.15s ease;
 }
-.mp__rail:hover .mp__knob { transform: translateY(-50%) scale(1); }
+.mp__rail:hover .mp__knob,
+.mp__rail:active .mp__knob { transform: translateY(-50%) scale(1); }
 .mp__time {
   font-size: 11px;
   letter-spacing: 0.08em;
@@ -1202,9 +1234,8 @@ canvas { display: block; touch-action: none; }
     bottom: max(14px, 3vh);
   }
   .hero__track { font-size: 10px; padding: 4px 2px; }
-  .hero__brand { top: 14px; left: 5vw; }
-  /* el crédito queda justo bajo el cuadro (que mide ~83vw de alto) */
-  .hero__credit {
+  /* el hint queda justo bajo el logo-tela (que mide ~83vw de alto) */
+  .hero__abouthint {
     bottom: auto;
     top: calc(50% + 46vw);
     font-size: 9px;
@@ -1341,7 +1372,8 @@ canvas { display: block; touch-action: none; }
   text-transform: uppercase;
   color: var(--agua);
 }
-/* lockup oficial apilado, con la barra en azul agua cromo (como el home) */
+/* lockup oficial apilado: EL MISMO logo del home (sticker negro + sombra
+   rosa), con un LED sutil respirando en los bordes de la barra */
 .about__title {
   margin: 0.5rem 0 1.2rem;
 }
@@ -1353,16 +1385,31 @@ canvas { display: block; touch-action: none; }
   color: #131210;
 }
 .about__title .lk-bar {
-  /* mismo sticker negro + sombra rosa del hero */
   background: var(--bar);
   color: var(--bar-ink);
   padding: 0.02em 0.12em 0.06em;
-  box-shadow: 0.09em 0.09em 0 var(--logo); /* ÚNICO color: la sombra rosa del logo */
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
+  /* sombra dura rosa del logo + halo LED que respira en los bordes */
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.38),
-    inset 0 -3px 6px rgba(5, 47, 92, 0.45);
+    0.09em 0.09em 0 var(--logo),
+    0 0 14px rgba(217, 79, 138, 0.24);
+  animation: aboutLed 4.2s ease-in-out infinite;
+}
+@keyframes aboutLed {
+  0%, 100% {
+    box-shadow:
+      0.09em 0.09em 0 var(--logo),
+      0 0 10px rgba(217, 79, 138, 0.16);
+  }
+  50% {
+    box-shadow:
+      0.09em 0.09em 0 var(--logo),
+      0 0 22px rgba(217, 79, 138, 0.38);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .about__title .lk-bar { animation: none; }
 }
 .about__tag {
   font-size: clamp(1rem, 2.6vw, 1.5rem);
@@ -1875,4 +1922,18 @@ a.setlist__song:hover { color: #ef6aa6; }
 @media (max-width: 480px) {
   /* en pantallas muy estrechas los controles ocupan más filas */
   .subs { bottom: calc(9.6rem + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* ---------- accesibilidad: reduced motion ----------
+   Los adornos en bucle (agua cromada, vinilo, ecualizador, pulsos) saltan a
+   su cuadro final; las transiciones quedan cortas. Las animaciones GSAP de
+   entrada (una sola pasada, breves) se mantienen. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.15s !important;
+  }
 }

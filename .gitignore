@@ -31,3 +31,6 @@ web/about band/
 web/assets new/
 web/cover album/
 web/fanart/
+
+# ---- capturas para portfolio (medios pesados, no código) ----
+example portfolio/

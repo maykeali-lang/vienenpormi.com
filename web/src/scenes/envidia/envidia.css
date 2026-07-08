@@ -414,6 +414,51 @@
   font-family: inherit;
   color: inherit;
 }
+/* pausa manual: continuar (grande) + salida al home (discreta) */
+.env-veil--paused .env-veil__resume {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  padding: 18px 26px;
+}
+.env-veil--paused .env-veil__resume:hover { opacity: 0.75; }
+
+/* reloj + mini-controles agrupados a la derecha de la barra inferior */
+.env-bottomright {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* mini-controles de sistema (junto al reloj): pausa + salir al home */
+.env-sys {
+  display: flex;
+  gap: 6px;
+  pointer-events: auto;
+}
+.env-sys__btn {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1.5px solid rgba(26, 26, 26, 0.5);
+  border-radius: 8px;
+  background: rgba(244, 243, 238, 0.82);
+  color: #1a1a1a;
+  font-size: 12px;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.env-sys__btn:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
 
 .env-gate,
 .env-end {

@@ -168,6 +168,16 @@ export function About() {
     if (open) setMounted(true);
   }, [open]);
 
+  // ESC cierra el about (misma salida que la ✕)
+  useEffect(() => {
+    if (!mounted) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeRef.current?.();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mounted]);
+
   useLayoutEffect(() => {
     if (!mounted) return;
     const ctx = gsap.context(() => {
@@ -186,6 +196,7 @@ export function About() {
     return () => ctx.revert();
   }, [mounted]);
 
+  const closeRef = useRef<(() => void) | null>(null);
   const close = () => {
     if (!panelRef.current) {
       setOpen(false);
@@ -202,6 +213,7 @@ export function About() {
       },
     });
   };
+  closeRef.current = close;
 
   if (!mounted) return null;
 
@@ -230,6 +242,14 @@ export function About() {
 
           <header className="about__head about__reveal">
             <p className="about__loc mono">Maracaibo · Zulia · Venezuela</p>
+            {/* el mismo logo del home (sticker negro + sombra rosa), con un
+                LED sutil respirando en los bordes de la barra */}
+            <h1 className="about__title" aria-label="vienen por mi">
+              <span className="lk-line disp">vienen</span>
+              <span className="lk-line disp">
+                <span className="lk-bar">por mi</span>
+              </span>
+            </h1>
             <p className="about__tag">{t.ab_tag}</p>
           </header>
 

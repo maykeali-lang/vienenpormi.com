@@ -122,16 +122,103 @@ const FRAG = /* glsl */ `
   }
 `;
 
-function imgUrl() {
-  const b = import.meta.env.BASE_URL || "/";
-  // portada oficial del trabajo musical (proporcionada por Johan Galue)
-  return `${b}assets/portada.jpg`.replace(/\/{2,}/g, "/");
+// Paleta del lockup (idéntica a las variables CSS --bar/--bar-ink/--logo)
+const LOGO_PAPER = "#f0ebe0";
+const LOGO_INK = "#171019";
+const LOGO_CREAM = "#f6ecda";
+const LOGO_PINK = "#d94f8a";
+
+/**
+ * Textura del LOGO «vienen por mi» dibujada en canvas: el mismo lockup del
+ * about (Archivo Black, «por mi» sobre barra negra con sombra dura rosa y el
+ * símbolo de 3 barras debajo). Sustituye a la portada en la tela del home.
+ */
+async function makeLogoTexture(): Promise<THREE.CanvasTexture> {
+  const W = 1180;
+  const H = 1024;
+  const c = document.createElement("canvas");
+  c.width = W;
+  c.height = H;
+  const ctx = c.getContext("2d")!;
+
+  // espera la display font para que el wordmark no caiga al fallback
+  try {
+    await document.fonts.load('400 200px "Archivo Black"');
+    await document.fonts.ready;
+  } catch {
+    /* si la Font Loading API falla, se dibuja con la fuente disponible */
+  }
+
+  ctx.fillStyle = LOGO_PAPER;
+  ctx.fillRect(0, 0, W, H);
+
+  const font = (px: number) => `400 ${px}px "Archivo Black", system-ui, sans-serif`;
+  try {
+    // el lockup usa tracking apretado (-0.03em), igual que .lk-line
+    (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = "-0.03em";
+  } catch {
+    /* navegadores sin letterSpacing en canvas: se dibuja igual */
+  }
+
+  // tamaño: «vienen» define el ancho útil del lockup
+  const usable = W * 0.72;
+  let px = 300;
+  ctx.font = font(px);
+  px = Math.floor((px * usable) / Math.max(1, ctx.measureText("vienen").width));
+  ctx.font = font(px);
+
+  const lineH = px * 0.92;
+  const padX = px * 0.12;
+  const padTop = px * 0.02;
+  const padBot = px * 0.1;
+  const shadow = px * 0.09; // sombra dura rosa (0.09em, como .lk-bar)
+  const markGap = px * 0.42;
+  const markBarH = px * 0.055;
+  const markBlock = markBarH * 3 + markBarH * 1.6;
+  const blockH = lineH * 2 + padBot + markGap + markBlock;
+  const x0 = (W - usable) / 2;
+  const yTop = (H - blockH) / 2;
+
+  ctx.textBaseline = "alphabetic";
+  ctx.textAlign = "left";
+
+  // línea 1 — «vienen» en tinta sobre el papel
+  ctx.fillStyle = LOGO_INK;
+  ctx.fillText("vienen", x0, yTop + px * 0.82);
+
+  // línea 2 — «por mi» en crema sobre BARRA negra con sombra rosa
+  const w2 = ctx.measureText("por mi").width;
+  const barX = x0;
+  const barY = yTop + lineH - padTop;
+  const barW = w2 + padX * 2;
+  const barH = px * 0.82 + padTop + padBot;
+  ctx.fillStyle = LOGO_PINK;
+  ctx.fillRect(barX + shadow, barY + shadow, barW, barH);
+  ctx.fillStyle = LOGO_INK;
+  ctx.fillRect(barX, barY, barW, barH);
+  ctx.fillStyle = LOGO_CREAM;
+  ctx.fillText("por mi", x0 + padX, yTop + lineH + px * 0.74);
+
+  // símbolo oficial: tres barras (señal interferida), como en el about
+  const markY = barY + barH + shadow + markGap;
+  const markW = px * 0.62;
+  const widths = [1, 0.58, 0.8];
+  ctx.fillStyle = LOGO_INK;
+  widths.forEach((k, i) => {
+    ctx.fillRect(x0, markY + i * markBarH * 1.8, markW * k, markBarH);
+  });
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
 }
 
 export function mountCloth(
   container: HTMLElement,
   onPick?: () => void,
-): { dispose: () => void; exit: (onDone?: () => void) => void } {
+  onHover?: (over: boolean) => void,
+): { dispose: () => void; exit: (onDone?: () => void) => void; setPaused: (p: boolean) => void } {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -163,15 +250,16 @@ export function mountCloth(
       uWindStrength: { value: 0.2 },
       uFabricFreq: { value: 0.32 },
       uShadowOpacity: { value: 0.22 },
-      uLight: { value: 1.3 },
+      // el logo es tinta plana: sin ganancia LED (1.3 quemaba la crema)
+      uLight: { value: 1.02 },
       // shape/marcos bajados al mínimo (casi rectangular, sin borde)
       uEdgeScale: { value: 8.8 },
       uEdgeAmp: { value: 0.007 },
       uFrameSize: { value: 0.0 },
       uPhotoInset: { value: 0.0 },
       uPaperColor: { value: new THREE.Color(0xf0ebe0) },
-      uScratchAmp: { value: 0.0106272 },
-      uGrainAmp: { value: 0.034925 },
+      uScratchAmp: { value: 0.008 },
+      uGrainAmp: { value: 0.022 },
       uVignette: { value: 0.0 },
       uSeed: { value: 0.0 },
       uEdgeShadowColor: { value: new THREE.Color(0x000000) },
@@ -195,13 +283,25 @@ export function mountCloth(
     mesh.scale.set(h * texAspect, h, 1);
   };
 
-  const loader = new THREE.TextureLoader();
-  loader.load(imgUrl(), (tex) => {
-    tex.colorSpace = THREE.SRGBColorSpace;
+  let disposed = false;
+  void makeLogoTexture().then((tex) => {
+    if (disposed) {
+      tex.dispose();
+      return;
+    }
     material.uniforms.uTexture.value = tex;
-    texAspect = (tex.image?.width || 1) / (tex.image?.height || 1);
+    const img = tex.image as HTMLCanvasElement;
+    texAspect = (img?.width || 1) / (img?.height || 1);
     material.uniforms.uRatio.value = texAspect;
     fitCloth();
+    // el logo aparece con una respiración suave (no un pop)
+    mesh.scale.multiplyScalar(0.94);
+    gsap.to(mesh.scale, {
+      x: mesh.scale.x / 0.94,
+      y: mesh.scale.y / 0.94,
+      duration: 1.1,
+      ease: "power3.out",
+    });
   });
 
   const onResize = () => {
@@ -225,10 +325,18 @@ export function mountCloth(
   };
   let mx = 0;
   let my = 0;
+  let hovering = false;
   const onMove = (e: PointerEvent) => {
     mx = (e.clientX / window.innerWidth) * 2 - 1;
     my = (e.clientY / window.innerHeight) * 2 - 1;
-    if (onPick) container.style.cursor = hitsCloth(e.clientX, e.clientY) ? "pointer" : "";
+    if (onPick || onHover) {
+      const over = hitsCloth(e.clientX, e.clientY);
+      if (onPick) container.style.cursor = over ? "pointer" : "";
+      if (onHover && over !== hovering) {
+        hovering = over;
+        onHover(over);
+      }
+    }
   };
   window.addEventListener("pointermove", onMove, { passive: true });
 
@@ -243,9 +351,14 @@ export function mountCloth(
 
   const clock = new THREE.Clock();
   let raf = 0;
+  let paused = false;
+  let elapsed = 0;
   const animate = () => {
     raf = requestAnimationFrame(animate);
-    const t = clock.getElapsedTime();
+    const dt = clock.getDelta();
+    if (paused) return;
+    elapsed += dt;
+    const t = elapsed;
     // ondeo pausado: el shader recibe el tiempo a menos de la mitad de marcha
     material.uniforms.uTime.value = t * 0.42;
     if (!exiting) {
@@ -276,9 +389,16 @@ export function mountCloth(
     tl.to(mesh.rotation, { x: -1.15, z: 0.55, duration: 0.95, ease: "power1.in" }, 0);
   };
 
+  // pausa el render de la tela cuando el player mode la tapa (ahorra GPU);
+  // el reloj propio (elapsed) evita el salto de uTime al reanudar
+  const setPaused = (p: boolean) => {
+    paused = p;
+  };
+
   const dispose = () => {
+    disposed = true;
     cancelAnimationFrame(raf);
-    gsap.killTweensOf([mesh.position, mesh.rotation, material.uniforms.uWindStrength, material.uniforms.uExit]);
+    gsap.killTweensOf([mesh.position, mesh.rotation, mesh.scale, material.uniforms.uWindStrength, material.uniforms.uExit]);
     window.removeEventListener("resize", onResize);
     window.removeEventListener("pointermove", onMove);
     container.removeEventListener("click", onClick);
@@ -291,7 +411,7 @@ export function mountCloth(
     el.parentElement?.removeChild(el);
   };
 
-  return { dispose, exit };
+  return { dispose, exit, setPaused };
 }
 
 export type ClothHandle = ReturnType<typeof mountCloth>;

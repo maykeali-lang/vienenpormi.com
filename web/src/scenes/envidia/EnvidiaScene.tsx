@@ -171,7 +171,7 @@ function LifeGlyph() {
   );
 }
 
-const MAX_LIVES = 12; // debe coincidir con MAX_LIVES de game.ts (dificultad subida)
+const MAX_LIVES = 20; // debe coincidir con MAX_LIVES de game.ts (dificultad subida)
 
 export default function EnvidiaScene() {
   const [phase, setPhase] = useState<Phase>("loading");
@@ -324,6 +324,31 @@ export default function EnvidiaScene() {
     setPaused(false);
   };
 
+  const pauseNow = () => {
+    if (phaseRef.current !== "playing" || endingRef.current) return;
+    gameRef.current?.setPaused(true);
+    setPaused(true);
+  };
+
+  // ESC o P = pausa/continuar durante la partida (antes no había pausa
+  // manual y tampoco forma de salir al home sin terminar la canción)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" && e.key.toLowerCase() !== "p") return;
+      if (phaseRef.current !== "playing" || endingRef.current) return;
+      const el = e.target as HTMLElement | null;
+      if (el && /^(input|textarea)$/i.test(el.tagName)) return;
+      if (gameRef.current) {
+        setPaused((p) => {
+          gameRef.current?.setPaused(!p);
+          return !p;
+        });
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   const submittingRef = useRef(false);
   const register = async () => {
     if (submittingRef.current || submitted) return; // evita doble registro (Enter + click)
@@ -418,8 +443,19 @@ export default function EnvidiaScene() {
                 </span>
               ))}
             </div>
-            <div className="env-clock mono">
-              <span ref={timeRef}>0:00</span> / {fmtTime(DURATION)}
+            <div className="env-bottomright">
+              <div className="env-clock mono">
+                <span ref={timeRef}>0:00</span> / {fmtTime(DURATION)}
+              </div>
+              {/* pausa manual (esc/p) y salida al home sin terminar la run */}
+              <div className="env-sys">
+                <button className="env-sys__btn mono" onClick={pauseNow} title="pause (esc)">
+                  ❚❚
+                </button>
+                <a className="env-sys__btn mono" href={`${BASE}/` || "/"} title="exit to home">
+                  ⌂
+                </a>
+              </div>
             </div>
           </div>
 
@@ -516,9 +552,14 @@ export default function EnvidiaScene() {
       )}
 
       {paused && phase === "playing" && !ending && (
-        <button className="env-veil env-veil--btn mono" onClick={resume}>
-          paused — tap to continue
-        </button>
+        <div className="env-veil env-veil--paused mono">
+          <button className="env-veil__resume mono" onClick={resume}>
+            paused — tap to continue
+          </button>
+          <a className="env-gate__back mono" href={`${BASE}/` || "/"}>
+            ← exit to home
+          </a>
+        </div>
       )}
 
       {ending && !overlayHidden && !finished && (

@@ -18,7 +18,6 @@ const ASSET = `${(import.meta.env.BASE_URL || "/").replace(/\/$/, "")}/assets/or
 // alto/ancho de cada recorte (para no deformar las <image>)
 const IMG_AR = {
   luna: 393 / 420,
-  dia1: 429 / 720,
   dia2: 331 / 720,
   noche1: 422 / 534,
 } as const;
@@ -210,17 +209,15 @@ export class Stage {
 
     // NUBES REALES (fotos recortadas): día ⇄ noche por crossfade en el
     // crepúsculo. Mismos anchos/alturas que las nubes de papel anteriores.
+    // (nube-dia-1 se retiró: el recorte del modelo blanco venía con errores)
     const rnd = seeded(77);
-    const dayImgs = [
-      { href: `${ASSET}/nube-dia-1.png`, ar: IMG_AR.dia1 },
-      { href: `${ASSET}/nube-dia-2.png`, ar: IMG_AR.dia2 },
-    ];
+    const dayImg = { href: `${ASSET}/nube-dia-2.png`, ar: IMG_AR.dia2 };
     const nightImg = { href: `${ASSET}/nube-noche-1.png`, ar: IMG_AR.noche1 };
     const cloudDefs = [
-      { w: 300, y: 120, v: 0, flip: false },
-      { w: 210, y: 230, v: 1, flip: false },
-      { w: 380, y: 70, v: 1, flip: true },
-      { w: 250, y: 310, v: 0, flip: true },
+      { w: 300, y: 120, flip: false },
+      { w: 210, y: 230, flip: false },
+      { w: 380, y: 70, flip: true },
+      { w: 250, y: 310, flip: true },
     ];
     for (let i = 0; i < cloudDefs.length; i++) {
       const c = cloudDefs[i];
@@ -228,7 +225,7 @@ export class Stage {
       // el flip vive en un grupo interior para no pelear con el translate
       const inner = el("g", {}, g);
       if (c.flip) inner.setAttribute("transform", `scale(-1 1) translate(${-c.w} 0)`);
-      const dv = dayImgs[c.v];
+      const dv = dayImg;
       const day = el("image", {
         href: dv.href, x: 0, y: 0, width: c.w, height: c.w * dv.ar,
         preserveAspectRatio: "xMidYMid meet",

@@ -10,6 +10,7 @@
 // pulso) siguen a la batería vía analyser: la música ES el reloj del juego.
 
 import * as THREE from "three";
+import { LIBRETA_LYRICS } from "../../config/lyrics";
 import { StemMixer, StemName } from "./audio";
 import { loadEpaperSvg, EpaperRaster, EpaperSvg, makeDashTexture } from "./sprites";
 import {
@@ -72,7 +73,7 @@ const INTRO_SAFE = 27;
 
 // vidas máximas (dificultad SUBIDA 2026-07-05); debe coincidir con MAX_LIVES
 // del HUD en EnvidiaScene.tsx
-const MAX_LIVES = 12;
+const MAX_LIVES = 20;
 
 // Los sprites van SIN color (decisión 2026-07-03): nave y villanos son los
 // bocetos a lápiz tal cual salieron del cuaderno — grafito sobre papel.
@@ -214,6 +215,15 @@ export class EnvidiaGame {
   private shieldMesh!: THREE.Mesh;
   private songEnded = false;
 
+  // letra DIEGÉTICA: la letra de «libreta» escrita a lápiz en el cielo,
+  // a todo el ancho del top y DETRÁS de la formación de villanos
+  private lyricCanvas!: HTMLCanvasElement;
+  private lyricTex!: THREE.CanvasTexture;
+  private lyricMat!: THREE.MeshBasicMaterial;
+  private lyricMesh!: THREE.Mesh;
+  private lyricIdx = -1;
+  private lyricFade = 0;
+
   private score = 0;
   private lives = MAX_LIVES; // dificultad SUBIDA: menos vidas
   private streak = 0; // bajas seguidas sin recibir daño → multiplicador
@@ -317,6 +327,23 @@ export class EnvidiaGame {
     this.shieldMesh.visible = false;
     this.scene.add(this.shieldMesh);
 
+    // letra diegética: canvas → textura → quad a todo el ancho del top,
+    // detrás de la formación (renderOrder 2 < asteroides 5 < villanos 8)
+    this.lyricCanvas = document.createElement("canvas");
+    this.lyricCanvas.width = 2048;
+    this.lyricCanvas.height = 256;
+    this.lyricTex = new THREE.CanvasTexture(this.lyricCanvas);
+    this.lyricMat = new THREE.MeshBasicMaterial({
+      map: this.lyricTex,
+      transparent: true,
+      depthWrite: false,
+      opacity: 0,
+    });
+    this.lyricMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), this.lyricMat);
+    this.lyricMesh.renderOrder = 2;
+    this.lyricMesh.position.set(0, H * 0.38, 0.4);
+    this.scene.add(this.lyricMesh);
+
     this.onResize();
     window.addEventListener("resize", this.onResize);
     window.addEventListener("keydown", this.onKeyDown);
@@ -398,6 +425,13 @@ export class EnvidiaGame {
     this.shipW = this.playW * 0.19;
     this.shipH = this.shipW * this.shipRaster.aspect;
     this.ship.scale.set(this.shipW, this.shipH, 1);
+
+    // la banda de letra siempre cubre TODO el ancho visible
+    this.lyricMesh?.scale.set(
+      this.W,
+      this.W * (this.lyricCanvas.height / this.lyricCanvas.width),
+      1,
+    );
 
     const k = this.playW / oldPlayW;
     if (isFinite(k) && k > 0 && k !== 1) {
@@ -733,6 +767,35 @@ export class EnvidiaGame {
     b.mesh.rotation.z = Math.atan2(b.vx, -b.vy);
   }
 
+  /* --------------------------- letra diegética -------------------------- */
+
+  /** escribe la línea actual de la letra, a lápiz grafito sobre el cielo */
+  private drawLyric(text: string) {
+    const cv = this.lyricCanvas;
+    const ctx = cv.getContext("2d")!;
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    if (text) {
+      const font = (px: number) =>
+        `italic ${px}px "Segoe Script", "Bradley Hand", "Comic Sans MS", cursive`;
+      ctx.save();
+      ctx.translate(cv.width / 2, cv.height / 2);
+      ctx.rotate(-0.012); // apenas torcida, como escrita a mano en la libreta
+      let size = 150;
+      ctx.font = font(size);
+      const w = ctx.measureText(text).width;
+      if (w > cv.width * 0.94) {
+        size = Math.floor((size * cv.width * 0.94) / w);
+        ctx.font = font(size);
+      }
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#8d887c"; // grafito claro: se lee sin pisar la acción
+      ctx.fillText(text, 0, 0);
+      ctx.restore();
+    }
+    this.lyricTex.needsUpdate = true;
+  }
+
   /* ------------------------------ update ------------------------------ */
 
   private update(dt: number) {
@@ -746,6 +809,17 @@ export class EnvidiaGame {
       this.syncClock = 0;
       this.mixer.syncTick();
     }
+
+    // ------ letra diegética (el cielo del top, tras los villanos) ------
+    let li = -1;
+    for (let i = 0; i < LIBRETA_LYRICS.length && LIBRETA_LYRICS[i].t <= t; i++) li = i;
+    if (li !== this.lyricIdx) {
+      this.lyricIdx = li;
+      this.drawLyric(li >= 0 ? LIBRETA_LYRICS[li].text : "");
+      this.lyricFade = 0;
+    }
+    this.lyricFade = Math.min(1, this.lyricFade + dt / 0.8);
+    this.lyricMat.opacity = 0.6 * this.lyricFade;
 
     // ------ pulso musical (batería cruda) ------
     const drum = this.mixer.drumEnergy();
@@ -1227,6 +1301,12 @@ export class EnvidiaGame {
       (d.mesh.material as THREE.Material).dispose();
     }
     for (const t of this.propTextures) t.dispose();
+    if (this.lyricMesh) {
+      this.scene.remove(this.lyricMesh);
+      this.lyricMesh.geometry.dispose();
+    }
+    this.lyricMat?.dispose();
+    this.lyricTex?.dispose();
     this.shipRaster?.dispose();
     this.dashTex?.dispose();
     this.enemyDashTex?.dispose();

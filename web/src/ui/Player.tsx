@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { bumpPlay, fetchPlays, type PlayCounts, type TrackId } from "../state/plays";
 import { useT } from "../i18n";
@@ -209,6 +209,9 @@ export function Player({ initialIdx = 0 }: { initialIdx?: number } = {}) {
     if (a.paused) a.play().catch(() => {});
     else a.pause();
   };
+  // el listener de teclado (efecto de montaje) necesita el toggle fresco
+  const toggleRef = useRef<(() => void) | null>(null);
+  toggleRef.current = toggle;
 
   // drag del carrusel: proxy de puntero con umbral, como el Draggable del repo
   const onPointerDown = (e: React.PointerEvent) => {
@@ -255,8 +258,52 @@ export function Player({ initialIdx = 0 }: { initialIdx?: number } = {}) {
       ringRef.current.style.transform = `translateZ(${-radius}px) rotateY(${angleRef.current.value}deg)`;
   }, [radius]);
 
+  // entrada del player: las cartas suben con stagger desde el centro y el
+  // transporte aparece después (una sola vez, al montar)
+  const rootRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      // el stage entero sube (las cartas tienen transform inline del anillo
+      // 3D: ahí solo se anima opacity, nunca transform)
+      gsap.fromTo(
+        ".mp__stage",
+        { opacity: 0, y: 36 },
+        { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", clearProps: "all" },
+      );
+      gsap.fromTo(
+        ".mp__card",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.55, ease: "power2.out", stagger: { each: 0.07, from: "center" }, clearProps: "opacity" },
+      );
+      gsap.fromTo(
+        [".mp__controls", ".mp__transport"],
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.6, delay: 0.25, ease: "power2.out", stagger: 0.08, clearProps: "all" },
+      );
+    }, rootRef);
+    return () => ctx.revert();
+  }, []);
+
+  // teclado dentro del player: espacio = play/pausa · ←/→ = tema anterior/siguiente
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null;
+      if (el && /^(input|textarea|select)$/i.test(el.tagName)) return;
+      if (e.code === "Space") {
+        e.preventDefault();
+        toggleRef.current?.();
+      } else if (e.key === "ArrowRight") {
+        goRef.current?.((idxRef.current + 1) % TRACKS.length, !audioRef.current?.paused);
+      } else if (e.key === "ArrowLeft") {
+        goRef.current?.((idxRef.current - 1 + TRACKS.length) % TRACKS.length, !audioRef.current?.paused);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
-    <div className="mp">
+    <div className="mp" ref={rootRef}>
       <figure
         className="mp__stage"
         ref={stageRef}
@@ -282,6 +329,10 @@ export function Player({ initialIdx = 0 }: { initialIdx?: number } = {}) {
               }}
               aria-label={t.upcoming ? `${t.name} — ${t9.aria_card_soon}` : `${t9.aria_play} ${t.name}`}
             >
+              {/* vinilo: asoma girando tras la portada cuando el tema suena */}
+              <span className="mp__card-vinyl" aria-hidden="true">
+                <i />
+              </span>
               <span
                 className="mp__card-art"
                 style={{ backgroundImage: `url(${COVER})` }}

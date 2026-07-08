@@ -25,17 +25,17 @@ const OUTRO_DUR = 142;
 const GATE_KEY = "vpm-gate-v1";
 
 /**
- * HOME / HERO de «vienen por mi»: la portada («Donde suceden cosas»,
- * por Johan Galue) ondea como tela; abajo, el setlist minimal en orden:
- * 01 outro (collage de UAPs) · 02 libreta (el juego de nave) ·
- * 03 orgullo (barquito de papel) · 04 envidia (preview en el reproductor) ·
- * 05 ira (el directo instrumental low poly — se entra desde aquí).
+ * HOME / HERO de «vienen por mi»: el LOGO de la banda ondea como tela al
+ * centro (click = abre el about); abajo, el setlist minimal en orden:
+ * 01 ira (el directo instrumental low poly — se entra desde aquí) ·
+ * 02 libreta (el juego de nave) · 03 orgullo (barquito de papel) ·
+ * 04 envidia (preview en el reproductor) · 05 outro (collage de UAPs).
+ * La portada de Galue vive ahora solo en el music player.
  */
 export function Hero() {
   const phase = useApp((s) => s.phase);
   const error = useApp((s) => s.error);
   const setHeroDone = useApp((s) => s.setHeroDone);
-  const setAboutOpen = useApp((s) => s.setAboutOpen);
   const t = useT();
   const lang = useLang((s) => s.lang);
   const toggleLang = useLang((s) => s.toggle);
@@ -46,8 +46,8 @@ export function Hero() {
   const clothRef = useRef<ClothHandle | null>(null);
   const [exiting, setExiting] = useState(false);
   const [orgulloDur, setOrgulloDur] = useState(ORGULLO_DUR);
-  // crédito de la portada: oculto hasta que se hace click sobre el cuadro
-  const [creditShown, setCreditShown] = useState(false);
+  // hint «about» bajo el logo-tela: aparece al pasar el cursor por encima
+  const [logoHover, setLogoHover] = useState(false);
   // modo del home: experiencia (tela + setlist) o music player (carrusel)
   const [playerMode, setPlayerMode] = useState(false);
   // carta inicial del player (el atajo «04 · envidia» abre en su preview)
@@ -80,10 +80,14 @@ export function Hero() {
     };
   }, []);
 
-  // tela ondeante (three.js) con la portada; click sobre el cuadro → crédito
+  // tela ondeante (three.js) con el LOGO; click sobre él → abre el about
   useEffect(() => {
     if (!bgRef.current) return;
-    const cloth = mountCloth(bgRef.current, () => setCreditShown((v) => !v));
+    const cloth = mountCloth(
+      bgRef.current,
+      () => useApp.getState().setAboutOpen(true),
+      (over) => setLogoHover(over),
+    );
     clothRef.current = cloth;
     return () => cloth.dispose();
   }, []);
@@ -91,12 +95,40 @@ export function Hero() {
   // cambia entre experiencia y music player
   const togglePlayerMode = () => setPlayerMode((v) => !v);
 
-  // intro del setlist (el logotipo queda QUIETO: sin efecto de movimiento)
+  // el player tapa la tela: pausa su render (GPU) mientras esté abierto;
+  // ESC vuelve del player a la experiencia
+  useEffect(() => {
+    clothRef.current?.setPaused(playerMode);
+    if (!playerMode) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !useApp.getState().aboutOpen) setPlayerMode(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [playerMode]);
+
+  // intro del home: setlist con stagger desde el centro + chips de la
+  // esquina con un back.out sutil (el logo-tela hace su propia entrada)
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".hero__tracks .hero__track", {
-        opacity: 0, y: 12, duration: 0.6, stagger: 0.08, ease: "power3.out",
-      });
+      gsap.fromTo(
+        ".hero__tracks .hero__track",
+        { opacity: 0, y: 14 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.65,
+          delay: 0.15,
+          ease: "power3.out",
+          stagger: { each: 0.07, from: "center" },
+          clearProps: "opacity,transform",
+        },
+      );
+      gsap.fromTo(
+        [".hero__mode", ".hero__lang"],
+        { opacity: 0, y: -10 },
+        { opacity: 1, y: 0, duration: 0.55, delay: 0.35, ease: "back.out(1.4)", stagger: 0.1, clearProps: "opacity,transform" },
+      );
     }, rootRef);
     return () => ctx.revert();
   }, []);
@@ -110,7 +142,7 @@ export function Hero() {
 
     // se desvanece la interfaz del home mientras la tela sale volando
     const overlay = rootRef.current?.querySelectorAll(
-      ".hero__brand, .hero__tracks, .hero__credit, .hero__error",
+      ".hero__tracks, .hero__abouthint, .hero__mode, .hero__lang, .hero__error",
     );
     if (overlay?.length) gsap.to(overlay, { opacity: 0, duration: 0.3, ease: "power2.out" });
 
@@ -141,20 +173,12 @@ export function Hero() {
       <div className="hero__cloth" ref={bgRef} />
       <div className="hero__flash" ref={flashRef} />
 
-      {/* logo compacto (arriba-izquierda): nunca pisa el cuadro de la portada */}
-      <button
-        className="hero__brand hero__logobtn"
-        onClick={() => setAboutOpen(true)}
-        aria-label={t.aria_about}
-      >
-        <span className="lk-line disp">vienen</span>
-        <span className="lk-line disp">
-          <span className="lk-bar">por mi</span>
-        </span>
-        <span className="hero__logohint mono">{t.about_hint}</span>
-      </button>
+      {/* hint bajo el logo-tela: el logo ES el botón del about */}
+      <span className={`hero__abouthint mono${logoHover ? " is-on" : ""}`} aria-hidden="true">
+        {t.about_hint}
+      </span>
 
-      {/* toggle de modo (arriba a la derecha, contraparte del logo):
+      {/* toggle de modo (arriba a la derecha):
           music player ⇄ experiencia */}
       <button className="hero__mode mono" onClick={togglePlayerMode}>
         {playerMode ? t.mode_exp : t.mode_player}
@@ -175,20 +199,17 @@ export function Hero() {
         <div className="hero__player">
           <span className="hero__demo mono">demo</span>
           <Player key={playerStart} initialIdx={playerStart} />
+          {/* la portada de Galue vive aquí: su crédito también */}
+          <p className="hero__playercredit mono">
+            {t.credit_by}{" "}
+            <a href="https://johangalue.com" target="_blank" rel="noopener noreferrer">
+              johan galue ↗
+            </a>
+          </p>
         </div>
       )}
 
       {error && <div className="hero__error mono">⚠ {error}</div>}
-
-      {/* crédito de la portada: aparece solo al hacer click sobre el cuadro */}
-      {creditShown && (
-        <p className="hero__credit mono">
-          {t.credit_by}{" "}
-          <a href="https://johangalue.com" target="_blank" rel="noopener noreferrer">
-            johan galue ↗
-          </a>
-        </p>
-      )}
 
       {/* setlist minimal, en orden, en la parte inferior:
           01 ira (directo, intro/primera pista) … 05 outro (última pista) */}
