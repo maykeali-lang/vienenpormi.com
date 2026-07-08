@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -195,6 +195,14 @@ code{
 }
 .btn:focus-visible,a:focus-visible{outline:3px solid var(--lion-cobalt);outline-offset:3px}
 
+/* bilingüe: bloques .l-es / .l-en conmutados por data-lang en <html> */
+html[data-lang=en] .l-es{display:none!important}
+html[data-lang=es] .l-en{display:none!important}
+.top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.top-row a.back{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--pencil-graphite);text-decoration:none}
+.lang-toggle{display:inline-flex;gap:6px;align-items:center;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--pencil-graphite);background:none;border:1.5px solid rgba(58,58,62,.35);border-radius:999px;padding:6px 12px;cursor:pointer}
+.lang-toggle i{font-style:normal;opacity:.5}
+.lang-toggle .on{color:var(--lion-orange);font-weight:700}
 footer{padding:0 0 46px;text-align:center;font-size:.8rem;color:var(--pencil-graphite)}
 footer a{color:var(--lion-orange);font-weight:600;text-decoration:none}
 </style>
@@ -204,11 +212,16 @@ footer a{color:var(--lion-orange);font-weight:600;text-decoration:none}
 <div class="wrap">
 
   <header>
-    <a href="/" target="_top" style="display:inline-block;margin-bottom:18px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--pencil-graphite);text-decoration:none">&larr; vienen por mi</a>
-    <br>
-    <span class="eyebrow">Devlog · Detrás del proceso</span>
-    <h1>De la libreta<br>al juego <span class="x">×</span> Lion&nbsp;Mix</h1>
-    <p class="subtitle">Todo <strong>«Vienen por mí»</strong> nació dentro de una libreta e-paper: la nave, los cuatro villanos y el mundo entero, dibujados a lápiz antes de escribir una sola línea de código. Este es el registro de cómo esos trazos llegaron a la pantalla — <strong>sin perder ni uno</strong>.</p>
+    <div class="top-row">
+      <a class="back" href="/" target="_top">&larr; vienen por mi</a>
+      <button class="lang-toggle" type="button" aria-label="es / en">
+        <span data-l="es">es</span><i>/</i><span data-l="en">en</span>
+      </button>
+    </div>
+    <span class="eyebrow"><span class="l-es">Devlog · Detrás del proceso</span><span class="l-en">Devlog · Behind the process</span></span>
+    <h1><span class="l-es">De la libreta<br>al juego <span class="x">×</span> Lion&nbsp;Mix</span><span class="l-en">From the notebook<br>to the game <span class="x">×</span> Lion&nbsp;Mix</span></h1>
+    <p class="subtitle l-es">Todo <strong>«Vienen por mí»</strong> nació dentro de una libreta e-paper: la nave, los cuatro villanos y el mundo entero, dibujados a lápiz antes de escribir una sola línea de código. Este es el registro de cómo esos trazos llegaron a la pantalla — <strong>sin perder ni uno</strong>.</p>
+    <p class="subtitle l-en">All of <strong>“Vienen por mí”</strong> was born inside an e-paper notebook: the ship, the four villains and the whole world, drawn in pencil before a single line of code. This is the record of how those strokes reached the screen — <strong>without losing a single one</strong>.</p>
   </header>
 
   <div class="pencil-path" aria-hidden="true">
@@ -218,10 +231,11 @@ footer a{color:var(--lion-orange);font-weight:600;text-decoration:none}
   <section id="libreta">
     <div class="chapter">
       <span class="chapter-num">01</span>
-      <h2>La <mark>libreta</mark></h2>
-      <span class="tag">lápiz · e-paper</span>
+      <h2><span class="l-es">La <mark>libreta</mark></span><span class="l-en">The <mark>notebook</mark></span></h2>
+      <span class="tag"><span class="l-es">lápiz · e-paper</span><span class="l-en">pencil · e-paper</span></span>
     </div>
-    <p>Sin tableta gráfica, sin software de ilustración. El punto de partida fue el mismo de siempre: dibujar. Tres notebooks de una libreta e-paper guardan el ADN completo del juego — el <b>Notebook 7</b> con la nave en vista cenital, y los <b>Notebooks 8 y 9</b> con los estudios de personajes.</p>
+    <p class="l-es">Sin tableta gráfica, sin software de ilustración. El punto de partida fue el mismo de siempre: dibujar. Tres notebooks de una libreta e-paper guardan el ADN completo del juego — el <b>Notebook 7</b> con la nave en vista cenital, y los <b>Notebooks 8 y 9</b> con los estudios de personajes.</p>
+    <p class="l-en">No graphics tablet, no illustration software. The starting point was the same as always: drawing. Three notebooks of an e-paper tablet hold the game's complete DNA — <b>Notebook 7</b> with the ship in top-down view, and <b>Notebooks 8 and 9</b> with the character studies.</p>
     <div class="grid-2">
       <figure class="frame tilt-l"><img src="assets/libreta-proceso-1.webp" alt="La libreta e-paper con bocetos del juego en proceso" loading="lazy"></figure>
       <figure class="frame tilt-r"><img src="assets/libreta-proceso-2.webp" alt="Sesión de dibujo a lápiz en la libreta e-paper" loading="lazy"></figure>
@@ -235,12 +249,13 @@ footer a{color:var(--lion-orange);font-weight:600;text-decoration:none}
   <section id="vectores">
     <div class="chapter">
       <span class="chapter-num">02</span>
-      <h2>Los trazos se vuelven <mark>vectores</mark></h2>
-      <span class="tag">SVG · 0% simplificación</span>
+      <h2><span class="l-es">Los trazos se vuelven <mark>vectores</mark></span><span class="l-en">The strokes become <mark>vectors</mark></span></h2>
+      <span class="tag"><span class="l-es">SVG · 0% simplificación</span><span class="l-en">SVG · 0% simplification</span></span>
     </div>
-    <p>La regla del proyecto fue una sola: <b>100% de los trazos originales preservados, cero simplificación</b>. Cada boceto se exportó y se convirtió en SVG limpio — plantilla raster descartada, <code>viewBox</code> ajustado al bounding box real, rotado a orientación de lectura y agrupado con <code>&lt;g id&gt;</code> semánticos: <code>fuselaje</code>, <code>cabina</code>, <code>alas-turbinas</code>, <code>propulsion</code>, <code>armamento</code>.</p>
+    <p class="l-es">La regla del proyecto fue una sola: <b>100% de los trazos originales preservados, cero simplificación</b>. Cada boceto se exportó y se convirtió en SVG limpio — plantilla raster descartada, <code>viewBox</code> ajustado al bounding box real, rotado a orientación de lectura y agrupado con <code>&lt;g id&gt;</code> semánticos: <code>fuselaje</code>, <code>cabina</code>, <code>alas-turbinas</code>, <code>propulsion</code>, <code>armamento</code>.</p>
+    <p class="l-en">The project had a single rule: <b>100% of the original strokes preserved, zero simplification</b>. Every sketch was exported and turned into clean SVG — raster template discarded, <code>viewBox</code> fitted to the real bounding box, rotated to reading orientation and grouped with semantic <code>&lt;g id&gt;</code>s: <code>fuselaje</code>, <code>cabina</code>, <code>alas-turbinas</code>, <code>propulsion</code>, <code>armamento</code>.</p>
     <div class="stats">
-      <div class="stat"><b>284</b>paths · la nave</div>
+      <div class="stat"><b>284</b><span class="l-es">paths · la nave</span><span class="l-en">paths · the ship</span></div>
       <div class="stat"><b>259</b>paths · notebook 8</div>
       <div class="stat"><b>619</b>paths · notebook 9</div>
     </div>
@@ -254,30 +269,35 @@ footer a{color:var(--lion-orange);font-weight:600;text-decoration:none}
   <section id="villanos">
     <div class="chapter">
       <span class="chapter-num">03</span>
-      <h2>El casting de <mark>villanos</mark></h2>
-      <span class="tag">4 enemigos · 1 boss</span>
+      <h2><span class="l-es">El casting de <mark>villanos</mark></span><span class="l-en">The <mark>villain</mark> casting</span></h2>
+      <span class="tag"><span class="l-es">4 enemigos · 1 boss</span><span class="l-en">4 enemies · 1 boss</span></span>
     </div>
-    <p>Los cuatro salieron tal cual de la libreta: nadie fue redibujado «en limpio». Sus nombres nacieron de lo que ya eran en el papel.</p>
+    <p class="l-es">Los cuatro salieron tal cual de la libreta: nadie fue redibujado «en limpio». Sus nombres nacieron de lo que ya eran en el papel.</p>
+    <p class="l-en">All four came straight out of the notebook: nobody was redrawn “clean”. Their names grew out of what they already were on paper.</p>
     <div class="villains">
       <div class="v-card">
         <h3>LOLL</h3><span class="alias">the Slacker · N8-A</span>
         <div class="v-swatches"><i style="background:var(--lion-lime)"></i><i style="background:var(--lion-magenta)"></i><i style="background:var(--lion-brown)"></i></div>
-        <p>De <i>lolling tongue</i>: la lengua colgante. Ni se molesta en tener nombre largo. Ataca solo si lo despiertan.</p>
+        <p class="l-es">De <i>lolling tongue</i>: la lengua colgante. Ni se molesta en tener nombre largo. Ataca solo si lo despiertan.</p>
+        <p class="l-en">From <i>lolling tongue</i>. He can't even be bothered to have a long name. Only attacks if you wake him.</p>
       </div>
       <div class="v-card">
         <h3>CAPO</h3><span class="alias">The Murmur · BOSS FINAL · N8-B</span>
         <div class="v-swatches"><i style="background:var(--lion-red)"></i><i style="background:var(--lion-cobalt)"></i><i style="background:var(--lion-brown)"></i></div>
-        <p>Capo = jefe criminal + cap = su gorra. Visera baja, pañuelo: nunca sabes qué trama.</p>
+        <p class="l-es">Capo = jefe criminal + cap = su gorra. Visera baja, pañuelo: nunca sabes qué trama.</p>
+        <p class="l-en">Capo = crime boss + cap = his hat. Low visor, bandana: you never know what he's plotting.</p>
       </div>
       <div class="v-card">
         <h3>CACKLE</h3><span class="alias">the Laughtrack · N9-A</span>
         <div class="v-swatches"><i style="background:var(--lion-orange)"></i><i style="background:var(--lion-yellow)"></i><i style="background:var(--lion-violet)"></i></div>
-        <p>Su nombre es su risa hecha sonido: el globo de «HAHAHA» es parte física de él.</p>
+        <p class="l-es">Su nombre es su risa hecha sonido: el globo de «HAHAHA» es parte física de él.</p>
+        <p class="l-en">His name is his laugh made sound: the “HAHAHA” balloon is a physical part of him.</p>
       </div>
       <div class="v-card">
         <h3>SMIRK</h3><span class="alias">the Grinner · N9-B</span>
         <div class="v-swatches"><i style="background:var(--lion-green)"></i><i style="background:var(--lion-red)"></i><i style="background:var(--lion-gold)"></i></div>
-        <p>La sonrisa dentuda de medio lado, exacta al sketch. Sonríe hasta dormido.</p>
+        <p class="l-es">La sonrisa dentuda de medio lado, exacta al sketch. Sonríe hasta dormido.</p>
+        <p class="l-en">That toothy sideways grin, exact to the sketch. He smiles even in his sleep.</p>
       </div>
     </div>
     <figure class="frame tilt-l"><img src="assets/fichas-villanos.webp" alt="Fichas de los cuatro villanos: LOLL, CAPO, CACKLE y SMIRK con sus paletas de color" loading="lazy"></figure>
@@ -290,10 +310,11 @@ footer a{color:var(--lion-orange);font-weight:600;text-decoration:none}
   <section id="color">
     <div class="chapter">
       <span class="chapter-num">04</span>
-      <h2>El color: paleta <mark>Lion</mark></h2>
-      <span class="tag">12 markers · base + sombra</span>
+      <h2><span class="l-es">El color: paleta <mark>Lion</mark></span><span class="l-en">The color: <mark>Lion</mark> palette</span></h2>
+      <span class="tag"><span class="l-es">12 markers · base + sombra</span><span class="l-en">12 markers · base + shade</span></span>
     </div>
-    <p>El lápiz puso la forma; los marcadores pusieron la sangre. La paleta Lion son 12 pares base/sombra construidos sobre la estructura del papel: <code>--ink-black</code> para el contorno, <code>--paper-warm</code> como highlight y <code>--pencil-graphite</code> para el trazo de la nave. Cada villano toma exactamente tres marcadores — ni uno más.</p>
+    <p class="l-es">El lápiz puso la forma; los marcadores pusieron la sangre. La paleta Lion son 12 pares base/sombra construidos sobre la estructura del papel: <code>--ink-black</code> para el contorno, <code>--paper-warm</code> como highlight y <code>--pencil-graphite</code> para el trazo de la nave. Cada villano toma exactamente tres marcadores — ni uno más.</p>
+    <p class="l-en">Pencil gave the shape; markers gave the blood. The Lion palette is 12 base/shade pairs built on the paper's structure: <code>--ink-black</code> for outlines, <code>--paper-warm</code> as highlight and <code>--pencil-graphite</code> for the ship's stroke. Each villain takes exactly three markers — not one more.</p>
     <figure class="frame tilt-r"><img src="assets/paleta-lion.webp" alt="Paleta Lion: estructura del papel y 12 pares de marcadores base y sombra" loading="lazy"></figure>
   </section>
 
@@ -304,24 +325,48 @@ footer a{color:var(--lion-orange);font-weight:600;text-decoration:none}
   <section id="mundo1">
     <div class="chapter">
       <span class="chapter-num">05</span>
-      <h2><mark>Mundo 1</mark>: todo junto</h2>
-      <span class="tag">shooter vertical</span>
+      <h2><span class="l-es"><mark>Mundo 1</mark>: todo junto</span><span class="l-en"><mark>World 1</mark>: all together</span></h2>
+      <span class="tag"><span class="l-es">shooter vertical</span><span class="l-en">vertical shooter</span></span>
     </div>
-    <p>El primer mockup jugable: la nave del Notebook 7 abajo (vista cenital, canónica para el shooter), los cuatro villanos en formación arriba, y el marcador corriendo. Los trazos de la libreta, ahora con física, disparos y un mundo azul cielo esperando ser invadido.</p>
+    <p class="l-es">El primer mockup jugable: la nave del Notebook 7 abajo (vista cenital, canónica para el shooter), los cuatro villanos en formación arriba, y el marcador corriendo. Los trazos de la libreta, ahora con física, disparos y un mundo azul cielo esperando ser invadido.</p>
+    <p class="l-en">The first playable mockup: the Notebook 7 ship at the bottom (top-down view, canonical for the shooter), the four villains in formation above, and the score already running. The notebook strokes, now with physics, bullets and a sky-blue world waiting to be invaded.</p>
     <figure class="frame tilt-l" style="max-width:460px;margin-left:auto;margin-right:auto"><img src="assets/mundo1-mockup.webp" alt="Mockup del Mundo 1: la nave enfrentando a los cuatro villanos sobre fondo azul cielo" loading="lazy"></figure>
   </section>
 
   <div class="outro">
-    <h2>¿Listo para que vengan por ti?</h2>
-    <p>Cada enemigo que esquives fue primero un trazo de lápiz. Cada nivel, una página de la libreta.</p>
-    <a class="btn" href="/libreta" target="_top">Jugar «Vienen por mí»</a>
+    <h2><span class="l-es">¿Listo para que vengan por ti?</span><span class="l-en">Ready for them to come for you?</span></h2>
+    <p><span class="l-es">Cada enemigo que esquives fue primero un trazo de lápiz. Cada nivel, una página de la libreta.</span><span class="l-en">Every enemy you dodge was a pencil stroke first. Every level, a page of the notebook.</span></p>
+    <a class="btn" href="/libreta" target="_top"><span class="l-es">Jugar «Vienen por mí»</span><span class="l-en">Play “Vienen por mí”</span></a>
   </div>
 
   <footer>
-    Hecho a lápiz, marcador y código · <a href="https://voltanet.org">Voltanet</a> × Lion Mix
+    <span class="l-es">Hecho a lápiz, marcador y código</span><span class="l-en">Made with pencil, marker and code</span> · <a href="https://voltanet.org">Voltanet</a> × Lion Mix
   </footer>
 
 </div>
 </main>
+<script>
+(function(){
+  var KEY='vpm-lang';
+  var TITLES={es:'Detrás del proceso — Vienen por mí × Lion Mix',en:'Behind the process — Vienen por mí × Lion Mix'};
+  function saved(){try{var v=localStorage.getItem(KEY);if(v==='es'||v==='en')return v}catch(e){}return null}
+  function guess(){var l=(navigator.language||'en').toLowerCase();return l.indexOf('es')===0?'es':'en'}
+  function apply(l){
+    document.documentElement.setAttribute('data-lang',l);
+    document.documentElement.lang=l;
+    document.title=TITLES[l];
+    document.querySelectorAll('.lang-toggle [data-l]').forEach(function(el){
+      el.classList.toggle('on',el.getAttribute('data-l')===l);
+    });
+  }
+  var lang=saved()||guess();
+  apply(lang);
+  document.querySelector('.lang-toggle').addEventListener('click',function(){
+    lang=lang==='es'?'en':'es';
+    try{localStorage.setItem(KEY,lang)}catch(e){}
+    apply(lang);
+  });
+})();
+</script>
 </body>
 </html>
