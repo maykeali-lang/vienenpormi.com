@@ -224,24 +224,22 @@ export function About() {
       </button>
       <div className="about__panel" ref={panelRef}>
         <div className="about__scroll" ref={scrollRef}>
+          {/* topbar minimal: idioma a la izquierda, símbolo a la derecha
+              (el lockup grande de abajo ya dice quiénes somos) */}
           <div className="about__topbar mono">
-            <span>vienen por mi</span>
-            <div className="about__topbar-r">
-              <button
-                className="about__lang mono"
-                onClick={toggleLang}
-                aria-label={lang === "es" ? "Switch to English" : "Cambiar a español"}
-              >
-                <span className={lang === "es" ? "is-on" : ""}>es</span>
-                <i>/</i>
-                <span className={lang === "en" ? "is-on" : ""}>en</span>
-              </button>
-              <Mark />
-            </div>
+            <button
+              className="about__lang mono"
+              onClick={toggleLang}
+              aria-label={lang === "es" ? "Switch to English" : "Cambiar a español"}
+            >
+              <span className={lang === "es" ? "is-on" : ""}>es</span>
+              <i>/</i>
+              <span className={lang === "en" ? "is-on" : ""}>en</span>
+            </button>
+            <Mark />
           </div>
 
           <header className="about__head about__reveal">
-            <p className="about__loc mono">Maracaibo · Zulia · Venezuela</p>
             {/* el mismo logo del home (sticker negro + sombra rosa), con un
                 LED sutil respirando en los bordes de la barra */}
             <h1 className="about__title" aria-label="vienen por mi">

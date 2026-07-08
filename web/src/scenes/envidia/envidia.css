@@ -339,8 +339,8 @@
   position: relative;
   width: min(84vw, 640px);
   transform-origin: 50% 100%;
-  /* muy lento a propósito: da tiempo a leer el relato con calma */
-  animation: env-crawl 55s linear forwards;
+  /* ritmo ágil: se lee completo sin frenar las ganas de jugar */
+  animation: env-crawl 30s linear forwards;
   color: #e9b322;
   font-weight: 700;
   font-size: clamp(20px, 2.8vw, 30px);

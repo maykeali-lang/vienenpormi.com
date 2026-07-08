@@ -1300,7 +1300,7 @@ canvas { display: block; touch-action: none; }
   padding: 0 clamp(1.5rem, 8vw, 7rem) 10vh;
 }
 
-/* topbar de identidad: nombre · sección + símbolo */
+/* topbar minimal: idioma (izquierda) + símbolo (derecha) */
 .about__topbar {
   display: flex;
   justify-content: space-between;
@@ -1319,13 +1319,6 @@ canvas { display: block; touch-action: none; }
 }
 .about__dot { color: var(--agua-mid); }
 
-/* cluster derecho del topbar: switch de idioma + símbolo */
-.about__topbar-r {
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
-  flex: none;
-}
 .about__lang {
   display: inline-flex;
   align-items: center;
@@ -1366,16 +1359,13 @@ canvas { display: block; touch-action: none; }
 .about__mark--foot { width: 52px; }
 
 .about__head { max-width: 900px; margin-inline: auto; }
-.about__loc {
-  font-size: 12px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--agua);
-}
 /* lockup oficial apilado: EL MISMO logo del home (sticker negro + sombra
    rosa), con un LED sutil respirando en los bordes de la barra */
 .about__title {
-  margin: 0.5rem 0 1.2rem;
+  /* el sticker de «por mi» (line-height 0.84 + padding + sombra) desborda
+     por debajo de su línea: en pantallas grandes necesita más aire para no
+     pisar el tagline (se veía tapado en monitores grandes) */
+  margin: 0.5rem 0 clamp(1.4rem, 3.6vw, 3.6rem);
 }
 .about__title .lk-line {
   display: block;

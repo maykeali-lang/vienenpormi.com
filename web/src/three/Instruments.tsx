@@ -491,14 +491,14 @@ function Cymbal({
   );
 }
 
-/** Kit completo, mirando a camara — bateria negra «MDK», colocacion creible. */
+/** Kit completo, mirando a camara — bateria negra, colocacion creible. */
 export function DrumKit() {
   const shell = "#15151a"; // casco negro
   const shellSnare = "#2a2a32"; // redoblante negro un pelin mas claro
   return (
     <group position={[0, 0, -1.15]}>
-      {/* Bombo al frente, parche oscuro con cartel "MDK" encendido */}
-      <Drum pos={[0, 0.5, 0]} radius={0.5} depth={0.42} color={shell} reactKey="kick" headColor="#101015" logoText="MDK" />
+      {/* Bombo al frente, parche oscuro (sin cartel de nombre) */}
+      <Drum pos={[0, 0.5, 0]} radius={0.5} depth={0.42} color={shell} reactKey="kick" headColor="#101015" />
       {/* spurs (patas) del bombo, atras */}
       {[-0.4, 0.4].map((x, i) => (
         <Metal key={i} position={[x, 0.14, -0.16]} rotation={[-0.3, 0, x > 0 ? -0.4 : 0.4]} color="#9aa0ad">

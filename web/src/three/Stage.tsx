@@ -13,57 +13,15 @@ import { toonGradient } from "./materials";
 //  Posiciones/escala como constantes para afinar a ojo en el dev server.
 // ============================================================================
 
-/** Cartel LED encendido con texto (JAKE / CB) sobre el ampli. */
-function LedLabel({
-  text,
-  color,
-  position,
-}: {
-  text: string;
-  color: string;
-  position: [number, number, number];
-}) {
-  const tex = useMemo(() => {
-    const c = document.createElement("canvas");
-    c.width = 256;
-    c.height = 96;
-    const x = c.getContext("2d")!;
-    x.fillStyle = "#0c0a14";
-    x.fillRect(0, 0, 256, 96);
-    x.strokeStyle = "rgba(255,255,255,0.12)";
-    x.lineWidth = 4;
-    x.strokeRect(6, 6, 244, 84);
-    x.font = "700 60px 'Space Mono', ui-monospace, monospace";
-    x.textAlign = "center";
-    x.textBaseline = "middle";
-    x.shadowColor = color;
-    x.shadowBlur = 22;
-    x.fillStyle = color;
-    x.fillText(text, 128, 54);
-    x.shadowBlur = 0;
-    const t = new THREE.CanvasTexture(c);
-    t.colorSpace = THREE.SRGBColorSpace;
-    return t;
-  }, [text, color]);
-  return (
-    <mesh position={position}>
-      <planeGeometry args={[0.66, 0.25]} />
-      <meshStandardMaterial map={tex} emissiveMap={tex} emissive="#ffffff" emissiveIntensity={1.2} roughness={0.6} toneMapped={false} />
-    </mesh>
-  );
-}
-
-/** Amplificador con la única pantalla de color + cartel LED (JAKE / CB). */
+/** Amplificador con la única pantalla de color (sin cartel de nombre). */
 function Amp({
   position,
   color,
   energyKey,
-  label,
 }: {
   position: [number, number, number];
   color: string;
   energyKey: "bass" | "guitar";
-  label: string;
 }) {
   const mat = useRef<THREE.MeshStandardMaterial>(null!);
   useFrame(() => {
@@ -88,8 +46,6 @@ function Amp({
         <planeGeometry args={[0.9, 0.72]} />
         <meshStandardMaterial ref={mat} color="#2c2740" emissive={color} emissiveIntensity={0.1} roughness={0.9} metalness={0} toneMapped={false} />
       </mesh>
-      {/* cartel LED con el nombre (JAKE / CB) */}
-      <LedLabel text={label} color={color} position={[0, 0.05, 0.345]} />
       {/* panel de control superior */}
       <mesh position={[0, 0.6, 0.18]} rotation={[-0.42, 0, 0]}>
         <boxGeometry args={[1.08, 0.18, 0.14]} />
@@ -330,10 +286,10 @@ export function Stage({ quality }: { quality: Quality }) {
       <GLBModel url={MODELS.speaker} fit={2.7} fitAxis="y" position={[-7.6, 0, 1.8]} />
       <GLBModel url={MODELS.speaker} fit={2.7} fitAxis="y" position={[7.6, 0, 1.8]} />
 
-      {/* Backline elevado con la banda: amplificadores JAKE / CB + micrófono */}
+      {/* Backline elevado con la banda: amplificadores + micrófono */}
       <group position={[0, STAGE_LIFT, 0]}>
-        <Amp position={[-3.0, 0.62, -1.4]} color="#e8ddc4" energyKey="guitar" label="JAKE" />
-        <Amp position={[3.0, 0.62, -1.4]} color="#e8ddc4" energyKey="bass" label="CB" />
+        <Amp position={[-3.0, 0.62, -1.4]} color="#e8ddc4" energyKey="guitar" />
+        <Amp position={[3.0, 0.62, -1.4]} color="#e8ddc4" energyKey="bass" />
         {/* micrófono: cápsula mirando a la boca del bajista (giro 180°) */}
         <GLBModel url={MODELS.mic} fit={1.65} fitAxis="y" position={[2.5, 0, 0.9]} rotation={[0, 0, 0]} />
       </group>

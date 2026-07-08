@@ -30,11 +30,11 @@ interface Track {
 }
 
 const TRACKS: Track[] = [
+  // ?v=2026.2 = corte con el ruido de tierra filtrado (mp3 con immutable 30d)
   // ira = primera pista (el directo instrumental; su mixdown suena aquí)
-  { n: "01", name: "ira", src: `${BASE}/assets/songs/ira/mixdown.mp3` },
-  { n: "02", name: "libreta", src: `${BASE}/assets/songs/libreta/mixdown.mp3` },
-  // ?v=2026 = cache-buster del remaster (los mp3 van con immutable 30d)
-  { n: "03", name: "orgullo", src: `${BASE}/assets/songs/orgullo/mixdown.mp3?v=2026` },
+  { n: "01", name: "ira", src: `${BASE}/assets/songs/ira/mixdown.mp3?v=2026.2` },
+  { n: "02", name: "libreta", src: `${BASE}/assets/songs/libreta/mixdown.mp3?v=2026.2` },
+  { n: "03", name: "orgullo", src: `${BASE}/assets/songs/orgullo/mixdown.mp3?v=2026.2` },
   // envidia por estrenar: suena el preview del audio en loop
   { n: "04", name: "envidia", src: `${BASE}/assets/songs/envidia/preview.mp3`, preview: true },
   // outro = última pista: el tema del intro bajo el collage de UAPs

@@ -34,8 +34,9 @@ export const IRA: SongConfig = {
   band: "VIENEN POR MI",
   basePath: "assets/songs/ira",
   audio: {
-    mp3: "assets/songs/ira/mixdown.mp3",
-    ogg: "assets/songs/ira/mixdown.ogg",
+    // ?v=2026.2 = corte con el ruido de tierra filtrado (caché immutable 30d)
+    mp3: "assets/songs/ira/mixdown.mp3?v=2026.2",
+    ogg: "assets/songs/ira/mixdown.ogg?v=2026.2",
   },
   envelopes: "assets/songs/ira/envelopes.json",
 };

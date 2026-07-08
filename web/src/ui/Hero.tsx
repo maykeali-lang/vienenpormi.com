@@ -68,8 +68,8 @@ export function Hero() {
     const b = import.meta.env.BASE_URL || "/";
     const a = new Audio();
     a.preload = "metadata";
-    // ?v=2026 = cache-buster del remaster (los mp3 van con immutable 30d)
-    a.src = `${b}assets/songs/orgullo/mixdown.mp3`.replace(/\/{2,}/g, "/") + "?v=2026";
+    // ?v=2026.2 = corte con el ruido de tierra filtrado (immutable 30d)
+    a.src = `${b}assets/songs/orgullo/mixdown.mp3`.replace(/\/{2,}/g, "/") + "?v=2026.2";
     const onMeta = () => {
       if (isFinite(a.duration) && a.duration > 0) setOrgulloDur(a.duration);
     };

@@ -70,8 +70,8 @@ export default function OrgulloScene() {
     // ?v= = cache-buster del remaster (audio y análisis van con immutable 30d);
     // subir el sufijo cada vez que cambie el análisis publicado
     for (const [src, type] of [
-      [`${SONG}/mixdown.mp3?v=2026.1`, "audio/mpeg"],
-      [`${SONG}/mixdown.ogg?v=2026.1`, "audio/ogg"],
+      [`${SONG}/mixdown.mp3?v=2026.2`, "audio/mpeg"],
+      [`${SONG}/mixdown.ogg?v=2026.2`, "audio/ogg"],
     ]) {
       const s = document.createElement("source");
       s.src = src;

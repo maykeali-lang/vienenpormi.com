@@ -11,7 +11,8 @@ import "./envidia.css";
 
 const BASE = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
 // «libreta» = el juego de nave; suena la canción libreta (mixdown, sin stems)
-const MIX = `${BASE}/assets/songs/libreta/mixdown.mp3`;
+// ?v=2026.2 = corte con el ruido de tierra filtrado (caché immutable 30d)
+const MIX = `${BASE}/assets/songs/libreta/mixdown.mp3?v=2026.2`;
 const ART = `${BASE}/assets/envidia`;
 const DURATION = 293; // s del mixdown de «libreta»
 const BEST_KEY = "libreta-best";
@@ -296,12 +297,12 @@ export default function EnvidiaScene() {
     const game = gameRef.current!;
     const mixer = mixerRef.current!;
     setPhase("playing");
-    // crawl de apertura: el relato (corto) cae MUY lento para leerse con
-    // calma (~27 s); el juego corre detrás y nadie dispara hasta que se va
+    // crawl de apertura: el relato cae a ritmo ágil (~15 s, antes 27); el
+    // juego corre detrás y nadie dispara hasta que se va
     setCrawl(true);
     crawlTimers.current = [
-      window.setTimeout(() => setCrawlLeaving(true), 26000),
-      window.setTimeout(() => setCrawl(false), 27000),
+      window.setTimeout(() => setCrawlLeaving(true), 14000),
+      window.setTimeout(() => setCrawl(false), 15000),
     ];
     game.start();
     try {
