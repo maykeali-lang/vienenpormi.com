@@ -9,16 +9,24 @@ gsap.registerPlugin(ScrollTrigger);
 
 const IG_URL = "https://instagram.com/vienenpormi_";
 
-// integrantes con su instagram (botón sutil junto al nick). El rol se
-// traduce por clave i18n.
-const MEMBERS: { roleKey: "ab_role_vocals" | "ab_role_guitar" | "ab_role_drums"; nick: string; ig: string; web?: string }[] = [
-  { roleKey: "ab_role_vocals", nick: "colinabit", ig: "https://www.instagram.com/colinabit?igsh=NDF3cjF5djhuczFw" },
+// integrantes con su instagram (botón sutil junto al nick) y un símbolo de
+// la cultura del código delante del nick. El rol se traduce por clave i18n.
+const MEMBERS: {
+  roleKey: "ab_role_vocals" | "ab_role_guitar" | "ab_role_drums";
+  nick: string;
+  sym: string;
+  ig?: string;
+  web?: string;
+}[] = [
+  { roleKey: "ab_role_vocals", nick: "colinabit", sym: "</>", ig: "https://www.instagram.com/colinabit?igsh=NDF3cjF5djhuczFw" },
   {
     roleKey: "ab_role_guitar",
     nick: "xjake",
+    sym: "{ }",
     ig: "https://www.instagram.com/_xjake?igsh=MXBlaHQ1bGx0N3JxeQ==",
   },
-  { roleKey: "ab_role_drums", nick: "mdk", ig: "https://www.instagram.com/mdk_314?igsh=MTRvaWJubzRjZXVsOA==" },
+  { roleKey: "ab_role_guitar", nick: "axelle", sym: "=>", ig: "https://www.instagram.com/_axelle____?vrfl=MW9uZXUxOXFmam1oeA==" },
+  { roleKey: "ab_role_drums", nick: "mdk", sym: ";", ig: "https://www.instagram.com/mdk_314?igsh=MTRvaWJubzRjZXVsOA==" },
 ];
 
 /** Icono minimalista de Instagram (contorno). */
@@ -262,17 +270,22 @@ export function About() {
                 <li key={m.nick}>
                   <span>{t[m.roleKey]}</span>
                   <span className="about__nick">
+                    <span className="about__sym" aria-hidden="true">
+                      {m.sym}
+                    </span>
                     {m.nick}
-                    <a
-                      className="about__igmini"
-                      href={m.ig}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={`${m.nick} on Instagram`}
-                      title={`${m.nick} on Instagram`}
-                    >
-                      <IgIcon size={15} />
-                    </a>
+                    {m.ig && (
+                      <a
+                        className="about__igmini"
+                        href={m.ig}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={`${m.nick} on Instagram`}
+                        title={`${m.nick} on Instagram`}
+                      >
+                        <IgIcon size={15} />
+                      </a>
+                    )}
                     {m.web && (
                       <a
                         className="about__webmini"

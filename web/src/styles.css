@@ -1467,6 +1467,13 @@ canvas { display: block; touch-action: none; }
   align-items: center;
   gap: 0.45rem;
 }
+/* símbolo de código de cada integrante (</>, { }, =>, ;): glifo mono en azul agua */
+.about__sym {
+  color: var(--agua);
+  font-weight: 600;
+  letter-spacing: 0;
+  min-width: 1.8em;
+}
 /* botón de IG del integrante: sutil, se enciende en azul agua */
 .about__igmini {
   display: inline-flex;
